@@ -51,6 +51,10 @@ Thumbs.db
 scratch/
 temp_uploads/
 unsloth_compiled_cache/
+data_archives/
+*.zip
+*.7z
+*.rar
 
 # Browser automation profiles and temporary app state
 .superpowers/
