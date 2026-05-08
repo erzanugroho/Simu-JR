@@ -1,0 +1,63 @@
+# ============================================
+# Konfigurasi Simulasi Sidang MK
+# ============================================
+
+simulation:
+  jumlah_hakim: 3 # Panel hakim (3, 5, 7, atau 9)
+  jumlah_simulasi: 3 # Default N simulasi per run
+  mode: sequential # sequential | parallel
+
+llm:
+  base_url: "http://192.168.1.102:1234/v1"
+  api_key: "not-needed-for-local"
+  model_name: "local-model"
+  temperature_hakim: 0.1 # Deterministik untuk hakim
+  temperature_pihak: 0.7 # Lebih kreatif untuk para pihak
+  max_tokens: 2000 # Batas output per call — bantu KV cache allocation
+  # reasoning_effort: "none" # Matikan thinking mode untuk reasoning models
+
+rag:
+  db_path: "rag/chroma_db"
+  collection_name: "mk_knowledge_base"
+  embedding_model: "all-MiniLM-L6-v2"
+  n_results: 7 # Jumlah chunk yang di-retrieve per query
+  score_threshold: 0.5 # Minimum similarity score (0-1, lower = more similar for L2)
+
+memory:
+  max_history: 20 # Maks pesan di memory agent (sliding window)
+  summarize_after: 15 # Trigger summarization setelah N pesan
+
+scoring:
+  legal_standing: 25
+  kerugian_konstitusional: 20
+  substansi_argumen: 30
+  konsistensi_putusan: 15
+  kelengkapan_formil: 10
+
+intelligence_pipeline:
+  enabled: true
+  pipeline_mode: "lazy" # lazy | eager
+
+  collections:
+    knowledge_base: "mk_knowledge_base"
+    ratio_bank: "mk_ratio_bank"
+    attack_bank: "mk_attack_bank"
+    concern_bank: "mk_concern_bank"
+    survive_bank: "mk_survive_bank"
+
+  classifier:
+    temperature: 0.0
+    batch_size: 50
+    flag_priority_only: true
+
+  extraction:
+    ratio_n_results: 5
+    attack_n_results: 5
+    concern_n_results: 5
+    survive_n_results: 5
+
+self_correcting:
+  enabled: true
+  max_loops: 5
+  acceptance_threshold: 70
+  log_dir: "results/self_correcting_logs"

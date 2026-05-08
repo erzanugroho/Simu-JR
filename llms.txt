@@ -1,0 +1,36 @@
+# Simu JR
+> AI-powered Indonesian Constitutional Court judicial review simulation system.
+
+## Core Files
+
+- `README.md`: Main project documentation.
+- `simulasi/server.py`: FastAPI backend, API endpoints, SSE streaming, UI serving.
+- `simulasi/main.py`: CLI simulation runner.
+- `simulasi/config.yaml`: Main runtime configuration.
+- `simulasi/.env.example`: Environment template.
+- `simulasi/core/orchestrator.py`: Simulation flow and scoring.
+- `simulasi/core/agents.py`: Agent classes and role behavior.
+- `simulasi/core/llm_client.py`: LLM provider client configuration.
+- `simulasi/rag/retriever.py`: RAG retrieval layer.
+- `simulasi/rag/rebuild_all.py`: RAG and intelligence bank rebuild script.
+- `simulasi/frontend/src/hooks/useApi.ts`: Frontend API hooks.
+- `simulasi/frontend/src/types.ts`: Frontend API/domain types.
+
+## Documentation
+
+- `simulasi/docs/README.md`: Documentation index.
+- `simulasi/docs/ARCHITECTURE.md`: Architecture overview.
+- `simulasi/docs/API_REFERENCE.md`: Backend endpoint reference.
+- `simulasi/docs/MAINTENANCE.md`: Setup, testing, debugging, backup, and change checklist.
+- `simulasi/docs/DATA_PIPELINES.md`: Dataset, RAG, ChromaDB, and fine-tuning pipeline.
+- `simulasi/docs/DEVELOPMENT_MAP.md`: Code ownership and change map.
+
+## Key Concepts
+
+- Simulation engine: Multi-agent courtroom simulation for PUU/Judicial Review.
+- RAG: ChromaDB-backed retrieval from MK decisions, hearing transcripts, and intelligence banks.
+- Intelligence banks: Ratio, attack, judge concern, and survive collections.
+- Project store: JSON/file storage under `simulasi/results/projects`.
+- Simulation store: JSON storage under `simulasi/results/simulations`.
+- Frontend: React/Vite app served by FastAPI from `simulasi/frontend/dist`.
+

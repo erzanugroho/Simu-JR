@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  /* Judicial Excellence Light Palette */
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #f1f5f9;
+
+  /* Institutional Accents */
+  --color-primary: #1A365D;      /* Deep Blue */
+  --color-primary-light: #2c5282;
+  --color-primary-dim: #102a43;
+  --color-accent: #D4AF37;       /* Elegant Gold */
+  --color-accent-light: #e9d18c;
+  --color-accent-dim: #997c23;
+  --color-accent-glow: rgba(212, 175, 55, 0.15);
+
+  /* Text Colors */
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+
+  /* Role Colors (Refined) */
+  --color-hakim: #1A365D;
+  --color-pemohon: #047857;
+  --color-pemerintah: #b91c1c;
+  --color-system: #6d28d9;
+
+  /* Verdict Status */
+  --color-dikabulkan: #15803d;
+  --color-ditolak: #be123c;
+  --color-tidak-diterima: #b45309;
+
+  /* Borders & Shadows */
+  --color-border: #e2e8f0;
+
+  /* Font Families */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+/* Global styles */
+html {
+  font-size: 15px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+.animate-progress-indeterminate {
+  animation: progress-indeterminate 2s linear infinite;
+}

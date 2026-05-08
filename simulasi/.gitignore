@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Generated data files
+rag/rag_chunks.jsonl
+results/projects/*/files/
+results/simulations/
+results/projects/_index.json
+results/simulations/_index.json
+results/simulations/_index_backup.json
+
+# Logs
+*.log
+*.err.log
+*.out.log
+
+# Node.js (frontend)
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Project-specific
+temp_uploads/
+finetuning/unsloth_compiled_cache/
+finetuning/logs/
+finetuning/output/
+scratch/
+.superpowers/
+rag/chroma_db/
+rag/mk_knowledge_base/
+rag/rag_chunks*.jsonl
+results/
