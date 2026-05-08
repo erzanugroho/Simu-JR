@@ -16,7 +16,7 @@ except ImportError:
 
 def view_banks():
     print("="*60)
-    print("🔍 LITIGATION INTELLIGENCE BANK VIEWER")
+    print(" LITIGATION INTELLIGENCE BANK VIEWER")
     print("="*60)
     
     try:
@@ -36,7 +36,7 @@ def view_banks():
             count = stats.get(f"{id}_count", 0)
             table_data.append([name, id, f"{count:,} vectors"])
             
-        print("\n[📊] Statistik Bank:")
+        print("\n[] Statistik Bank:")
         print(tabulate(table_data, headers=["Nama Bank", "Collection ID", "Jumlah Data"], tablefmt="grid"))
         
         while True:
@@ -69,12 +69,12 @@ def view_banks():
             
             elif choice == "5":
                 q = input("Masukkan kata kunci pencarian: ")
-                print(f"\n🔍 Mencari '{q}' di semua bank...")
+                print(f"\n Mencari '{q}' di semua bank...")
                 
                 for id, name in banks:
                     res = retriever._query_collection(id, q, n_results=2)
                     if res["context_text"]:
-                        print(f"\n[✨] Hasil dari {name}:")
+                        print(f"\n[] Hasil dari {name}:")
                         print(res["context_text"])
                     else:
                         print(f"\n[ ] {name}: Tidak ditemukan hasil relevan.")

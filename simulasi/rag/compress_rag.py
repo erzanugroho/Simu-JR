@@ -1,12 +1,12 @@
 """
-Compress RAG Data — Kompresi data RAG tanpa kehilangan informasi.
+Compress RAG Data - Kompresi data RAG tanpa kehilangan informasi.
 
 Strategi kompresi (aman, zero info loss):
-1. Hapus duplikat exact → chunk teks identik di file berbeda cukup 1 copy
-2. Normalisasi whitespace → hapus spasi/newline berlebih
-3. Bersihkan noise PDF → hapus artefak seperti "K E T E T A P A N"
-4. Perbesar chunk_size → 2000 chars, overlap 100 (lebih sedikit chunks, lebih banyak konteks)
-5. Metadata enrich → tambah chunk_index dan total_chunks per dokumen
+1. Hapus duplikat exact -> chunk teks identik di file berbeda cukup 1 copy
+2. Normalisasi whitespace -> hapus spasi/newline berlebih
+3. Bersihkan noise PDF -> hapus artefak seperti "K E T E T A P A N"
+4. Perbesar chunk_size -> 2000 chars, overlap 100 (lebih sedikit chunks, lebih banyak konteks)
+5. Metadata enrich -> tambah chunk_index dan total_chunks per dokumen
 """
 import json
 import os
@@ -19,21 +19,21 @@ from tqdm import tqdm
 import fitz  # PyMuPDF
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# ─── PATHS ───
+# --- PATHS ---
 DIR_PUTUSAN = r"E:\Simu JR\putusan_pdf"
 DIR_RISALAH = r"E:\Simu JR\risalah_pdf"
 INPUT_JSONL = os.path.join(os.path.dirname(__file__), "rag_chunks.jsonl")
 OUTPUT_JSONL = os.path.join(os.path.dirname(__file__), "rag_chunks_compressed.jsonl")
 
-# ─── KONFIGURASI CHUNKING BARU ───
-CHUNK_SIZE = 2000       # Lebih besar → lebih sedikit chunks, lebih banyak konteks
+# --- KONFIGURASI CHUNKING BARU ---
+CHUNK_SIZE = 2000       # Lebih besar -> lebih sedikit chunks, lebih banyak konteks
 CHUNK_OVERLAP = 100     # Overlap kecil saja untuk continuity
 SEPARATORS = ["\n\n", "\n", ". ", " ", ""]
 
-# ─── NOISE CLEANING ───
+# --- NOISE CLEANING ---
 def clean_pdf_artifacts(text: str) -> str:
     """Bersihkan artefak PDF tanpa mengubah isi informasi."""
-    # 1. "K E T E T A P A N" → "KETETAPAN"
+    # 1. "K E T E T A P A N" -> "KETETAPAN"
     text = re.sub(r'\b([A-Z])(\s[A-Z]){3,}\b', 
                   lambda m: m.group(0).replace(' ', ''), text)
     
@@ -41,8 +41,8 @@ def clean_pdf_artifacts(text: str) -> str:
     # Tidak dihapus karena bisa jadi penting untuk konteks
     
     # 3. Normalisasi whitespace
-    text = re.sub(r' +', ' ', text)           # spasi ganda → single
-    text = re.sub(r'\n{3,}', '\n\n', text)    # newline 3+ → double
+    text = re.sub(r' +', ' ', text)           # spasi ganda -> single
+    text = re.sub(r'\n{3,}', '\n\n', text)    # newline 3+ -> double
     text = re.sub(r'\n +\n', '\n\n', text)    # baris kosong dengan spasi
     
     # 4. Hapus page number standalone (baris yang hanya berisi angka)
@@ -242,6 +242,6 @@ if __name__ == "__main__":
         else:
             print(f"File {INPUT_JSONL} tidak ditemukan. Gunakan mode 'pdf'.")
     
-    print(f"\n✅ Output tersimpan di: {OUTPUT_JSONL}")
+    print(f"\nOK Output tersimpan di: {OUTPUT_JSONL}")
     print("Untuk menggunakan data terkompresi, update path di create_vector_db.py:")
     print(f'  JSONL_PATH = r"{OUTPUT_JSONL}"')

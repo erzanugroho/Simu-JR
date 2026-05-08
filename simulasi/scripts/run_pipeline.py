@@ -1,11 +1,11 @@
 """
-Entry Point CLI — Litigation Intelligence Pipeline
+Entry Point CLI - Litigation Intelligence Pipeline
 ==================================================
 Menjalankan pipeline 7 agent untuk membangun intelligence bank.
 
 Urutan:
-  1. Agent 1 (Classifier) — dijalankan saat extract_and_chunk.py
-  2. Agent 5 (Survive Bank) — dampak paling langsung
+  1. Agent 1 (Classifier) - dijalankan saat extract_and_chunk.py
+  2. Agent 5 (Survive Bank) - dampak paling langsung
   3. Agent 4 (Judge Concern Bank)
   4. Agent 3 (Attack Bank)
   5. Agent 2 (Ratio Bank)
@@ -66,9 +66,9 @@ def main():
         stages = [args.stage]
 
     for stage in stages:
-        logger.info(f"\n{'─' * 50}")
+        logger.info(f"\n{'-' * 50}")
         logger.info(f"  STAGE: {stage.upper()}")
-        logger.info(f"{'─' * 50}")
+        logger.info(f"{'-' * 50}")
 
         if stage == "survive":
             run_survive_pipeline(args.jsonl, priority_only=args.priority_only, workers=args.workers)

@@ -1,5 +1,5 @@
 """
-Pipeline Utilities — Litigation Intelligence Pipeline
+Pipeline Utilities - Litigation Intelligence Pipeline
 =====================================================
 Helper functions untuk menjalankan pipeline 7 agent.
 """
@@ -193,7 +193,7 @@ def list_documents_by_type(doc_type: str, jsonl_path: str = None, priority_only:
                     continue
         return results
 
-    # Bangun where clause — filter di level DB
+    # Bangun where clause - filter di level DB
     if priority_only:
         where = {"$and": [
             {"jenis_dokumen":  {"$eq": doc_type}},

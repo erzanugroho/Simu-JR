@@ -1,5 +1,5 @@
 """
-Extract Risalah Dialogs — Fine-Tuning Dataset Builder
+Extract Risalah Dialogs - Fine-Tuning Dataset Builder
 =====================================================
 Parse risalah sidang chunks dari rag_chunks.jsonl menjadi
 multi-turn conversation pairs untuk fine-tuning Qwen.

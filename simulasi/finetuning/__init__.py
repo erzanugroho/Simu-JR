@@ -1,1 +1,1 @@
-# Fine-tuning module for Qwen 3.5 9B — Model Inferensi Sidang MK
+# Fine-tuning module for Qwen 3.5 9B - Model Inferensi Sidang MK

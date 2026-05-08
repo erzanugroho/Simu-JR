@@ -37,9 +37,9 @@ def extract_text_from_file(file_path: str, filename: str) -> str:
 # Consolidated CoT / Thinking Stripper
 # ============================================================
 # Unified implementation replaces duplicates in:
-#   - agents.py        → BaseAgent._strip_thinking_process()
-#   - orchestrator.py  → clean_transcript_content()
-#   - pdf_generator.py → _clean_cot()
+#   - agents.py        -> BaseAgent._strip_thinking_process()
+#   - orchestrator.py  -> clean_transcript_content()
+#   - pdf_generator.py -> _clean_cot()
 # ============================================================
 
 # Thinking keywords used for header-based block removal
@@ -79,7 +79,7 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
 
     original_len = len(text)
 
-    # ── 0. Envelope pattern: [THINK]...[/THINK] ──
+    # -- 0. Envelope pattern: [THINK]...[/THINK] --
     text = re.sub(r'\[THINK\].*?\[/THINK\]', '', text, flags=re.DOTALL | re.IGNORECASE)
     if aggressive:
         # Aggressive: hapus [THINK] tanpa penutup sampai sapaan formal
@@ -91,7 +91,7 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
         # Conservative: hapus [THINK] tanpa penutup sampai akhir
         text = re.sub(r'\[THINK\][\s\S]*', '', text, flags=re.IGNORECASE)
 
-    # ── 1. XML-style thinking tags (DeepSeek, Qwen, QwQ) ──
+    # -- 1. XML-style thinking tags (DeepSeek, Qwen, QwQ) --
     text = re.sub(
         r'<\s*(?:think|thinking|thought|reasoning)\s*>'
         r'([\s\S]*?)'
@@ -104,11 +104,11 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
         '', text, flags=re.IGNORECASE,
     )
 
-    # ── 2. Markdown code block thinking ──
+    # -- 2. Markdown code block thinking --
     text = re.sub(r'```\s*(?:think|thinking|thought|reasoning).*?```', '', text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r'```\s*(?:think|thinking|thought|reasoning)[\s\S]*', '', text, flags=re.IGNORECASE)
 
-    # ── 3. JSON blocks (scoring / feedback leak) — ONLY in non-aggressive (display) mode ──
+    # -- 3. JSON blocks (scoring / feedback leak) - ONLY in non-aggressive (display) mode --
     # In aggressive mode (agent response processing), we must preserve JSON
     # because it may be the actual response (e.g., RPH scoring, feedback).
     if not aggressive:
@@ -117,31 +117,31 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
             '', text, flags=re.DOTALL,
         )
 
-    # ── 4. Generic code blocks ──
+    # -- 4. Generic code blocks --
     text = re.sub(r'```[\s\S]*?```', '', text)
 
-    # ── 5. "Here's a thinking process" patterns ──
+    # -- 5. "Here's a thinking process" patterns --
     text = re.sub(r"(?i)here'?s\s+a?\s*(?:thinking|thought|reasoning)\s*(?:process|analysis)?:.*?\n\n", '\n\n', text, flags=re.DOTALL)
     text = re.sub(r"(?i)(?:thinking|thought|reasoning)\s*(?:process|analysis)?:.*?\n\n", '\n\n', text, flags=re.DOTALL)
 
-    # ── 6. Header-based thinking blocks ──
+    # -- 6. Header-based thinking blocks --
     for kw in _THINKING_KEYWORDS:
         pattern = rf"(?i)\**{re.escape(kw)}.*?\n\n"
         text = re.sub(pattern, '\n\n', text, flags=re.DOTALL)
 
-    # ── 7. Leading thinking markers ──
+    # -- 7. Leading thinking markers --
     text = re.sub(
         r"^(Thinking|Thought|Reasoning|Analisis|Analisa|Proses Berpikir|Planning|Rencana):.*?\n+",
         '', text, flags=re.IGNORECASE,
     )
 
-    # ── 8. Qwen/DeepSeek reasoning format ──
+    # -- 8. Qwen/DeepSeek reasoning format --
     text = re.sub(
         r"(?i)^(Wait[,\.]?\s+|Let me think[\.\s]+|Hmm[,\.]?\s+|Okay[,\.]?\s+(?:so|let me|I need to)\s+).*?(?:\n\n|\Z)",
         '', text, flags=re.DOTALL,
     )
 
-    # ── 9. Numbered checklist thinking that leaks through ──
+    # -- 9. Numbered checklist thinking that leaks through --
     text = re.sub(
         r'^\d+\.\s*\*\*(?:Self-Correction|Check against|Draft|Mental Refinement|Analyze|Identify|Formulate).*?\n\n',
         '\n\n', text, flags=re.MULTILINE | re.DOTALL | re.IGNORECASE,
@@ -153,7 +153,7 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
     # Inline notes in parentheses
     text = re.sub(r'\(Note:[^)]{0,300}\)', '', text, flags=re.IGNORECASE)
 
-    # ── 10. Trailing removal: self-correction, constraints, planning ──
+    # -- 10. Trailing removal: self-correction, constraints, planning --
     trailing_patterns = [
         r'\d+\.\s*\*\*Self-Correction.*$',
         r'\*\*Self-Correction/Verification.*$',
@@ -187,7 +187,7 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
     for pat in trailing_patterns:
         text = re.sub(pat, '', text, flags=re.MULTILINE | re.DOTALL)
 
-    # ── 11. Line-by-line removal: planning notes, internal reasoning ──
+    # -- 11. Line-by-line removal: planning notes, internal reasoning --
     line_patterns = [
         r'^\s*(?:-\s*)?(?:\*\*)?Address Q\d+.*$',
         r'^\s*(?:-\s*)?\*\*(?:Conclude|Maintain|Ensure|Start|Apply|Cite|Explain|Link|Attack|Emphasize)\b.*$',
@@ -210,7 +210,7 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
     for pat in line_patterns:
         text = re.sub(pat, '', text, flags=re.MULTILINE)
 
-    # ── 12. Formal opening hard cutoff (aggressive mode only) ──
+    # -- 12. Formal opening hard cutoff (aggressive mode only) --
     if aggressive:
         for opening in _FORMAL_OPENINGS:
             if opening in text:
@@ -224,7 +224,7 @@ def strip_cot(text: str, *, aggressive: bool = False) -> str:
                         text = text[idx:]
                 break
 
-    # ── 13. Whitespace cleanup ──
+    # -- 13. Whitespace cleanup --
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r'^[\s\n]+', '', text)
 

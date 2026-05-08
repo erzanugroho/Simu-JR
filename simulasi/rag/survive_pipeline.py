@@ -1,5 +1,5 @@
 """
-Survive Pipeline — Agent 5
+Survive Pipeline - Agent 5
 ==========================
 Ekstraksi jawaban Pemohon yang survive dari putusan dan risalah ke mk_survive_bank.
 """
@@ -21,26 +21,26 @@ def run_survive_pipeline(jsonl_path: str = None, priority_only: bool = True, wor
     Jalankan Agent 5: Ekstrak jawaban Pemohon yang survive.
     Memproses per FILE UNIK (bukan per chunk) untuk efisiensi.
     """
-    logger.info("🚀 Memulai Survive Pipeline (Agent 5)...")
+    logger.info(" Memulai Survive Pipeline (Agent 5)...")
 
     system_prompt = load_prompt("agent5_survive_extractor")
     if not system_prompt:
-        logger.error("❌ Prompt Agent 5 tidak ditemukan.")
+        logger.error("FAILED Prompt Agent 5 tidak ditemukan.")
         return
 
     all_chunks = (
         list_documents_by_type("putusan", jsonl_path, priority_only=priority_only) +
         list_documents_by_type("risalah", jsonl_path, priority_only=priority_only)
     )
-    logger.info(f"📄 Total chunks dimuat: {len(all_chunks)}")
+    logger.info(f" Total chunks dimuat: {len(all_chunks)}")
 
-    # ── Group chunks by source_file ─────────────────────────────────
+    # -- Group chunks by source_file ---------------------------------
     file_chunks: dict[str, list] = defaultdict(list)
     for chunk in all_chunks:
         source = chunk.get("metadata", {}).get("source_file", "unknown")
         file_chunks[source].append(chunk)
 
-    # ── Cek file yang sudah ada di database (untuk fitur Resume/Skip) ──
+    # -- Cek file yang sudah ada di database (untuk fitur Resume/Skip) --
     import chromadb
     from pathlib import Path as _Path
     db_path = str(_Path(__file__).parent / "chroma_db")
@@ -50,12 +50,12 @@ def run_survive_pipeline(jsonl_path: str = None, priority_only: bool = True, wor
         coll = chroma_client.get_collection(name="mk_survive_bank")
         existing_res = coll.get(include=["metadatas"])
         existing_files = {m.get("source_file") for m in existing_res["metadatas"] if m}
-        logger.info(f"🔍 Ditemukan {len(existing_files)} file yang sudah diproses sebelumnya. Akan di-skip.")
+        logger.info(f" Ditemukan {len(existing_files)} file yang sudah diproses sebelumnya. Akan di-skip.")
     except:
         existing_files = set()
 
     files_to_process = {s: c for s, c in file_chunks.items() if s not in existing_files}
-    logger.info(f"📁 File unik yang akan diproses: {len(files_to_process)} (Total: {len(file_chunks)}) | workers: {workers}")
+    logger.info(f" File unik yang akan diproses: {len(files_to_process)} (Total: {len(file_chunks)}) | workers: {workers}")
 
     def _process(item):
         source, chunks = item
@@ -121,7 +121,7 @@ def run_survive_pipeline(jsonl_path: str = None, priority_only: bool = True, wor
                     [f"survive_{source}_empty"]
                 )
 
-    logger.info("✅ Survive pipeline selesai.")
+    logger.info("OK Survive pipeline selesai.")
 
 
 if __name__ == "__main__":

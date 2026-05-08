@@ -1,17 +1,17 @@
 """
-Project Store — Persistent Storage untuk Project Management
+Project Store - Persistent Storage untuk Project Management
 ============================================================
 Menyimpan setiap project sebagai directory dengan metadata JSON,
 file uploads, research history, dan audit results.
 
 Struktur penyimpanan:
   results/projects/
-    _index.json                         — index cepat untuk listing (metadata saja)
+    _index.json                         - index cepat untuk listing (metadata saja)
     <project_id>/
-      metadata.json                     — data lengkap project
-      files/                            — uploaded files (PDF, DOCX, TXT)
-      research/                         — research findings
-      audit/                            — audit results
+      metadata.json                     - data lengkap project
+      files/                            - uploaded files (PDF, DOCX, TXT)
+      research/                         - research findings
+      audit/                            - audit results
 """
 
 import json
@@ -106,7 +106,7 @@ def _update_index_entry(project_id: str):
     _save_index(index)
 
 
-# ─── CRUD ───────────────────────────────────────────────────────────────
+# --- CRUD ---------------------------------------------------------------
 
 
 def create_project(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -252,7 +252,7 @@ def delete_project(project_id: str) -> bool:
     return True
 
 
-# ─── Files ──────────────────────────────────────────────────────────────
+# --- Files --------------------------------------------------------------
 
 ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.doc', '.txt'}
 
@@ -363,7 +363,7 @@ def delete_project_file(project_id: str, file_id: str) -> bool:
     return True
 
 
-# ─── Research ───────────────────────────────────────────────────────────
+# --- Research -----------------------------------------------------------
 
 
 def save_research(project_id: str, query: str, answer: str, sources: List[str] = None) -> Optional[Dict[str, Any]]:
@@ -418,7 +418,7 @@ def list_research(project_id: str) -> List[Dict[str, Any]]:
     return findings
 
 
-# ─── Audit ──────────────────────────────────────────────────────────────
+# --- Audit --------------------------------------------------------------
 
 
 def save_audit(project_id: str, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -473,7 +473,7 @@ def list_audits(project_id: str) -> List[Dict[str, Any]]:
     return audits
 
 
-# ─── Migration ──────────────────────────────────────────────────────────
+# --- Migration ----------------------------------------------------------
 
 
 def migrate_legacy_simulations() -> Optional[str]:

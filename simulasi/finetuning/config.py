@@ -1,5 +1,5 @@
 """
-Konfigurasi Fine-Tuning Qwen 3.5 9B — Model Inferensi Sidang MK
+Konfigurasi Fine-Tuning Qwen 3.5 9B - Model Inferensi Sidang MK
 ================================================================
 Hyperparameters dan path configuration untuk training pipeline.
 """

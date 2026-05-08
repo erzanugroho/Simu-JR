@@ -22,14 +22,14 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# ─── Konfigurasi ────────────────────────────────────────────────
+# --- Konfigurasi ------------------------------------------------
 LINK_FILE = "pdf_links_putusan_puu.txt"          # File berisi daftar URL
 OUTPUT_DIR = "putusan_pdf"                        # Folder output
 MAX_WORKERS = 5                                   # Jumlah thread paralel
 MAX_RETRIES = 3                                   # Retry per file
 TIMEOUT = 60                                      # Timeout per request (detik)
 CHUNK_SIZE = 8192                                 # Ukuran chunk download
-# ────────────────────────────────────────────────────────────────
+# ----------------------------------------------------------------
 
 
 def read_links(filepath: str) -> list[str]:
@@ -85,7 +85,7 @@ def download_file(url: str, output_dir: str, index: int, total: int) -> dict:
         existing_size = os.path.getsize(filepath)
         result["status"] = "skipped"
         result["size"] = existing_size
-        print(f"  [{index}/{total}] ⏭  SKIP (sudah ada): {filename} ({format_size(existing_size)})")
+        print(f"  [{index}/{total}] SKIP  SKIP (sudah ada): {filename} ({format_size(existing_size)})")
         return result
 
     for attempt in range(1, MAX_RETRIES + 1):
@@ -111,7 +111,7 @@ def download_file(url: str, output_dir: str, index: int, total: int) -> dict:
             file_size = os.path.getsize(filepath)
             result["status"] = "success"
             result["size"] = file_size
-            print(f"  [{index}/{total}] ✅ OK: {filename} ({format_size(file_size)})")
+            print(f"  [{index}/{total}] OK OK: {filename} ({format_size(file_size)})")
             return result
 
         except requests.exceptions.HTTPError as e:
@@ -125,13 +125,13 @@ def download_file(url: str, output_dir: str, index: int, total: int) -> dict:
 
         if attempt < MAX_RETRIES:
             wait = attempt * 2
-            print(f"  [{index}/{total}] ⚠️  Retry {attempt}/{MAX_RETRIES} untuk {filename} "
+            print(f"  [{index}/{total}] WARNING  Retry {attempt}/{MAX_RETRIES} untuk {filename} "
                   f"({result['error']}), tunggu {wait}s...")
             time.sleep(wait)
 
     # Semua retry gagal
     result["status"] = "failed"
-    print(f"  [{index}/{total}] ❌ GAGAL: {filename} — {result['error']}")
+    print(f"  [{index}/{total}] FAILED GAGAL: {filename} - {result['error']}")
 
     # Hapus file yang tidak lengkap
     if os.path.exists(filepath):
@@ -147,21 +147,21 @@ def main():
 
     # Baca links
     if not os.path.exists(link_file):
-        print(f"❌ File tidak ditemukan: {link_file}")
+        print(f"FAILED File tidak ditemukan: {link_file}")
         sys.exit(1)
 
     links = read_links(link_file)
     total = len(links)
 
     if total == 0:
-        print("❌ Tidak ada link valid ditemukan.")
+        print("FAILED Tidak ada link valid ditemukan.")
         sys.exit(1)
 
     # Buat folder output
     os.makedirs(output_dir, exist_ok=True)
 
     print("=" * 60)
-    print(f"📥 PDF Downloader — Putusan MK")
+    print(f" PDF Downloader - Putusan MK")
     print(f"=" * 60)
     print(f"  Total link  : {total}")
     print(f"  Output      : {output_dir}")
@@ -186,7 +186,7 @@ def main():
 
     elapsed = time.time() - start_time
 
-    # ─── Ringkasan ──────────────────────────────────────────────
+    # --- Ringkasan ----------------------------------------------
     success = [r for r in results if r["status"] == "success"]
     skipped = [r for r in results if r["status"] == "skipped"]
     failed = [r for r in results if r["status"] == "failed"]
@@ -194,19 +194,19 @@ def main():
 
     print()
     print("=" * 60)
-    print(f"📊 RINGKASAN")
+    print(f" RINGKASAN")
     print(f"=" * 60)
-    print(f"  ✅ Berhasil didownload : {len(success)}")
-    print(f"  ⏭  Sudah ada (skip)   : {len(skipped)}")
-    print(f"  ❌ Gagal               : {len(failed)}")
-    print(f"  📁 Total ukuran       : {format_size(total_size)}")
-    print(f"  ⏱  Waktu              : {elapsed:.1f} detik")
-    print(f"  📂 Folder output      : {output_dir}")
+    print(f"  OK Berhasil didownload : {len(success)}")
+    print(f"  SKIP  Sudah ada (skip)   : {len(skipped)}")
+    print(f"  FAILED Gagal               : {len(failed)}")
+    print(f"   Total ukuran       : {format_size(total_size)}")
+    print(f"  TIME  Waktu              : {elapsed:.1f} detik")
+    print(f"   Folder output      : {output_dir}")
     print("=" * 60)
 
     if failed:
         print()
-        print("❌ Daftar file yang gagal:")
+        print("FAILED Daftar file yang gagal:")
         for r in failed:
             print(f"   - {r['filename']} ({r['error']})")
             print(f"     {r['url']}")
@@ -216,7 +216,7 @@ def main():
         with open(log_file, "w", encoding="utf-8") as f:
             for r in failed:
                 f.write(f"{r['url']}\n")
-        print(f"\n📝 Link yang gagal disimpan ke: {log_file}")
+        print(f"\n Link yang gagal disimpan ke: {log_file}")
 
 
 if __name__ == "__main__":

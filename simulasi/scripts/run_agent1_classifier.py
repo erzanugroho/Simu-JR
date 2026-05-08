@@ -4,8 +4,8 @@ Agent 1 Retroactive Classifier
 Mengklasifikasi dokumen-dokumen yang sudah ada di ChromaDB.
 
 OPTIMASI:
-- Satu klasifikasi per FILE unik (bukan per chunk) → hemat 10-100x waktu
-- Parallel processing dengan ThreadPoolExecutor → hemat 2-4x waktu
+- Satu klasifikasi per FILE unik (bukan per chunk) -> hemat 10-100x waktu
+- Parallel processing dengan ThreadPoolExecutor -> hemat 2-4x waktu
 - Progress di-save otomatis; bisa dilanjutkan jika terputus
 - Supports --all untuk proses semua file tanpa limit
 """
@@ -79,7 +79,7 @@ def get_unique_files_to_classify(coll, doc_type="putusan", limit=None):
             source = meta.get("source_file", chunk_id)
 
             if "flag_priority" in meta:
-                # Sudah diklasifikasi — skip, catat sebagai done
+                # Sudah diklasifikasi - skip, catat sebagai done
                 already_done.add(source)
                 continue
 
@@ -111,7 +111,7 @@ def classify_one(args):
     except Exception as e:
         with _lock:
             _counter["error"] += 1
-        logger.warning(f"  [{index}/{total}] ⚠️ Error: {source}: {e}")
+        logger.warning(f"  [{index}/{total}] WARNING Error: {source}: {e}")
         return "error", source
 
     if agent1_meta:
@@ -124,22 +124,22 @@ def classify_one(args):
                 if is_priority:
                     _counter["priority"] += 1
         except Exception as e:
-            logger.warning(f"  ⚠️ Gagal update ChromaDB untuk {source}: {e}")
+            logger.warning(f"  WARNING Gagal update ChromaDB untuk {source}: {e}")
             return "error", source
 
         klaster = new_meta.get("klaster", "N/A")
         flag = new_meta.get("flag_priority", "false")
-        star = "⭐ PRIORITAS" if str(flag).lower() == "true" else "  -"
+        star = "PRIORITY PRIORITAS" if str(flag).lower() == "true" else "  -"
         logger.info(f"  [{index}/{total}] {star} {source} | {klaster}")
         return "ok", source
     else:
-        logger.warning(f"  [{index}/{total}] ⚠️ Tidak ada hasil untuk: {source}")
+        logger.warning(f"  [{index}/{total}] WARNING Tidak ada hasil untuk: {source}")
         return "empty", source
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Agent 1 Retroactive Classifier — 1 klasifikasi per file PDF unik"
+        description="Agent 1 Retroactive Classifier - 1 klasifikasi per file PDF unik"
     )
     parser.add_argument(
         "--limit", type=int, default=None,
@@ -178,14 +178,14 @@ def main():
     )
 
     logger.info(f"\n{'='*60}")
-    logger.info(f"  ✅ Sudah diklasifikasi sebelumnya : {already_done_count:,} file")
-    logger.info(f"  🔄 Akan diklasifikasi sekarang   : {len(candidates):,} file")
-    logger.info(f"  ⏱️  Estimasi waktu (@30s/file, {args.workers} worker): "
+    logger.info(f"  OK Sudah diklasifikasi sebelumnya : {already_done_count:,} file")
+    logger.info(f"   Akan diklasifikasi sekarang   : {len(candidates):,} file")
+    logger.info(f"  TIME  Estimasi waktu (@30s/file, {args.workers} worker): "
                 f"{len(candidates)*30//args.workers//60} menit")
     logger.info(f"{'='*60}\n")
 
     if not candidates:
-        logger.info("🎉 Semua file sudah diklasifikasi!")
+        logger.info(" Semua file sudah diklasifikasi!")
         return
 
     total = len(candidates)
@@ -203,7 +203,7 @@ def main():
             for task in tasks:
                 result, source = classify_one(task)
                 if result == "interrupted":
-                    logger.info("\n⚠️ Dihentikan. Progress tersimpan otomatis.")
+                    logger.info("\nWARNING Dihentikan. Progress tersimpan otomatis.")
                     break
                 # Progress report setiap 10 file
                 done = _counter["done"] + _counter["error"]
@@ -212,9 +212,9 @@ def main():
                     rate = done / elapsed if elapsed > 0 else 0
                     remaining = (total - done) / rate if rate > 0 else 0
                     logger.info(
-                        f"  📊 Progress: {done}/{total} | "
-                        f"⭐ {_counter['priority']} prioritas | "
-                        f"⏱️ Sisa ~{remaining/60:.0f} menit"
+                        f"   Progress: {done}/{total} | "
+                        f"PRIORITY {_counter['priority']} prioritas | "
+                        f"TIME Sisa ~{remaining/60:.0f} menit"
                     )
         else:
             # Multi-threaded
@@ -224,7 +224,7 @@ def main():
                     for future in as_completed(futures):
                         result, source = future.result()
                         if result == "interrupted":
-                            logger.info("\n⚠️ Dihentikan. Progress tersimpan otomatis.")
+                            logger.info("\nWARNING Dihentikan. Progress tersimpan otomatis.")
                             executor.shutdown(wait=False)
                             break
                         done = _counter["done"] + _counter["error"]
@@ -233,26 +233,26 @@ def main():
                             rate = done / elapsed if elapsed > 0 else 0
                             remaining = (total - done) / rate if rate > 0 else 0
                             logger.info(
-                                f"  📊 Progress: {done}/{total} | "
-                                f"⭐ {_counter['priority']} prioritas | "
-                                f"⏱️ Sisa ~{remaining/60:.0f} menit"
+                                f"   Progress: {done}/{total} | "
+                                f"PRIORITY {_counter['priority']} prioritas | "
+                                f"TIME Sisa ~{remaining/60:.0f} menit"
                             )
                 except KeyboardInterrupt:
-                    logger.info("\n⚠️ Dihentikan. Progress tersimpan otomatis.")
+                    logger.info("\nWARNING Dihentikan. Progress tersimpan otomatis.")
                     executor.shutdown(wait=False)
 
     except KeyboardInterrupt:
-        logger.info("\n⚠️ Dihentikan. Progress tersimpan otomatis.")
+        logger.info("\nWARNING Dihentikan. Progress tersimpan otomatis.")
 
     elapsed = time.time() - start_time
     logger.info("\n" + "=" * 60)
     logger.info(f"  SELESAI")
-    logger.info(f"  ✅ Berhasil diklasifikasi : {_counter['done']:,} file")
-    logger.info(f"  ⭐ Ditandai prioritas     : {_counter['priority']:,} file")
-    logger.info(f"  ❌ Error                  : {_counter['error']:,} file")
-    logger.info(f"  ⏱️  Total waktu           : {elapsed/60:.1f} menit")
+    logger.info(f"  OK Berhasil diklasifikasi : {_counter['done']:,} file")
+    logger.info(f"  PRIORITY Ditandai prioritas     : {_counter['priority']:,} file")
+    logger.info(f"  FAILED Error                  : {_counter['error']:,} file")
+    logger.info(f"  TIME  Total waktu           : {elapsed/60:.1f} menit")
     logger.info("=" * 60)
-    logger.info("\n👉 Sekarang jalankan: python run_pipeline.py --stage all --priority-only")
+    logger.info("\n Sekarang jalankan: python run_pipeline.py --stage all --priority-only")
 
 
 if __name__ == "__main__":

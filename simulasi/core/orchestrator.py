@@ -1,15 +1,15 @@
 """
-Simulation Orchestrator — Sidang MK
+Simulation Orchestrator - Sidang MK
 =====================================
 Mengatur alur sidang pengujian undang-undang (PUU) sesuai hukum acara MK.
 Setiap ronde meng-query RAG untuk memperkaya argumen agents dengan referensi hukum.
 
 Alur Sidang (ROADMAP terintegrasi):
-  Ronde 1  → Pemeriksaan Pendahuluan (Legal Standing)
-  Ronde 2  → Perbaikan Permohonan (opsional)
-  Ronde 2B → Pemeriksaan Ahli — BARU (ROADMAP Fase 3 #4)
-  Ronde 3  → Pokok Perkara + Pihak Terkait + Amicus Curiae — DIPERLUAS (ROADMAP Fase 2 #2)
-  Ronde 4  → Kesimpulan & RPH + Dissenting Opinion — DIPERLUAS (ROADMAP Fase 2 #1)
+  Ronde 1  -> Pemeriksaan Pendahuluan (Legal Standing)
+  Ronde 2  -> Perbaikan Permohonan (opsional)
+  Ronde 2B -> Pemeriksaan Ahli - BARU (ROADMAP Fase 3 #4)
+  Ronde 3  -> Pokok Perkara + Pihak Terkait + Amicus Curiae - DIPERLUAS (ROADMAP Fase 2 #2)
+  Ronde 4  -> Kesimpulan & RPH + Dissenting Opinion - DIPERLUAS (ROADMAP Fase 2 #1)
 
 Fitur Baru:
   - Validator Dalil (Anti-Hallucination) sebelum pencatatan transcript (ROADMAP Fase 2 #3)
@@ -46,7 +46,7 @@ from .agents import (
 )
 from rag.pasal_api import pasal_api
 
-# Import retriever — graceful fallback jika DB belum ada
+# Import retriever - graceful fallback jika DB belum ada
 try:
     if os.getenv("SIMU_DISABLE_RAG_IMPORT") == "1":
         raise ImportError("RAG import disabled by SIMU_DISABLE_RAG_IMPORT")
@@ -55,7 +55,7 @@ try:
     RAG_AVAILABLE = True
 except Exception as e:
     RAG_AVAILABLE = False
-    logging.warning(f"⚠️ RAG tidak tersedia: {e}. Simulasi berjalan tanpa referensi hukum.")
+    logging.warning(f"WARNING RAG tidak tersedia: {e}. Simulasi berjalan tanpa referensi hukum.")
 
 logger = logging.getLogger(__name__)
 
@@ -188,12 +188,12 @@ class SimulationOrchestrator:
             try:
                 self.retriever = RAGRetriever()
                 stats = self.retriever.get_stats()
-                logger.info(f"📚 RAG terhubung: {stats['total_vectors']:,} vectors")
+                logger.info(f" RAG terhubung: {stats['total_vectors']:,} vectors")
             except Exception as e:
-                logger.warning(f"⚠️ RAG init gagal: {e}")
+                logger.warning(f"WARNING RAG init gagal: {e}")
                 self.retriever = None
         elif self.retriever:
-            logger.info("📚 Menggunakan shared RAG retriever")
+            logger.info(" Menggunakan shared RAG retriever")
 
         self.transcript: List[Dict[str, str]] = []
         self.draft_context: str = ""  # Disimpan setelah ronde 1
@@ -419,9 +419,9 @@ class SimulationOrchestrator:
             verdict = validation_result.get("verdict", "")
             warnings = validation_result.get("suspicious_citations", [])
             warning_text = (
-                f"\n\n⚠️  [VALIDATOR DALIL — {verdict}] "
+                f"\n\nWARNING  [VALIDATOR DALIL - {verdict}] "
                 f"Potensi halusinasi terdeteksi:\n"
-                + "\n".join(f"  • {w}" for w in warnings)
+                + "\n".join(f"  - {w}" for w in warnings)
             )
             display_content = content + warning_text
 
@@ -452,7 +452,7 @@ class SimulationOrchestrator:
                 validation_result = await self.validator.validate(content)
                 if validation_result.get("verdict") != "LOLOS":
                     logger.warning(
-                        f"[VALIDATOR] {speaker} — {validation_result.get('verdict')}: "
+                        f"[VALIDATOR] {speaker} - {validation_result.get('verdict')}: "
                         f"{validation_result.get('suspicious_citations', [])}"
                     )
             except Exception as e:
@@ -471,7 +471,7 @@ class SimulationOrchestrator:
                 query, agent_role=role, use_intelligence_banks=use_intelligence_banks
             )
             if context:
-                logger.info(f"📎 RAG context ditemukan untuk {role} ({len(context)} chars)")
+                logger.info(f" RAG context ditemukan untuk {role} ({len(context)} chars)")
             return context
         except Exception as e:
             logger.warning(f"RAG query error: {e}")
@@ -528,7 +528,7 @@ class SimulationOrchestrator:
             except Exception as e:
                 logger.warning(f"Batch RAG fetch error for {role}: {e}")
                 self._rag_cache[cache_key] = ""
-        logger.info(f"📦 Batch RAG: {len(query_role_pairs)} queries prefetched")
+        logger.info(f" Batch RAG: {len(query_role_pairs)} queries prefetched")
 
     async def _fetch_uu_context_from_api(self, draft: str) -> str:
         """Ekstrak nama UU/Pasal dari draft dan cari teks aslinya di pasal.id API."""
@@ -550,7 +550,7 @@ class SimulationOrchestrator:
         if not queries:
             return ""
             
-        logger.info(f"🔍 Mengambil teks pasal asli dari pasal.id untuk: {queries}")
+        logger.info(f" Mengambil teks pasal asli dari pasal.id untuk: {queries}")
         context_parts = []
         for q in queries:
             res = await pasal_api.search(q, limit=3)
@@ -574,7 +574,7 @@ class SimulationOrchestrator:
     # ================================================================
     async def run_round_1_pendahuluan(self, draft_input: str):
         """
-        Sidang Pendahuluan — Majelis Hakim menguji legal standing Pemohon.
+        Sidang Pendahuluan - Majelis Hakim menguji legal standing Pemohon.
         Panel 3 hakim secara bergiliran menanyakan aspek legal standing.
         """
         round_name = "Ronde 1: Pemeriksaan Pendahuluan"
@@ -655,7 +655,7 @@ class SimulationOrchestrator:
     # ================================================================
     async def run_round_2_perbaikan(self):
         """
-        Sidang Perbaikan — Majelis memberikan nasihat perbaikan permohonan.
+        Sidang Perbaikan - Majelis memberikan nasihat perbaikan permohonan.
         Dalam MK asli, pemohon diberi 14 hari untuk memperbaiki.
         Di simulasi ini, hakim memberikan catatan perbaikan.
         """
@@ -683,17 +683,17 @@ class SimulationOrchestrator:
         await self._validated_log(round_name, self.pemohon.name, perbaikan)
 
     # ================================================================
-    # RONDE 2B: PEMERIKSAAN AHLI (ROADMAP Fase 3 #4) — BARU
+    # RONDE 2B: PEMERIKSAAN AHLI (ROADMAP Fase 3 #4) - BARU
     # ================================================================
     async def run_round_2b_ahli(self):
         """
-        Sidang Pemeriksaan Ahli — Ronde tambahan setelah Perbaikan Permohonan.
+        Sidang Pemeriksaan Ahli - Ronde tambahan setelah Perbaikan Permohonan.
         Ahli Pemohon dan Ahli Pemerintah berdebat di tataran teori konstitusi.
         Hakim menguji keduanya dengan pertanyaan akademis.
         (ROADMAP Fase 3 #4)
         """
         if not self.include_ahli or not self.ahli_pemohon or not self.ahli_pemerintah:
-            logger.info("⏭️ Ronde 2B (Ahli) dilewati — agen ahli tidak aktif.")
+            logger.info("SKIP Ronde 2B (Ahli) dilewati - agen ahli tidak aktif.")
             return
 
         round_name = "Ronde 2B: Pemeriksaan Ahli"
@@ -790,7 +790,7 @@ class SimulationOrchestrator:
     # ================================================================
     async def run_round_3_pokok_perkara(self):
         """
-        Sidang Pokok Perkara — Pemohon memaparkan argumen substantif,
+        Sidang Pokok Perkara - Pemohon memaparkan argumen substantif,
         Pemerintah memberikan keterangan bantahan, Hakim menguji keduanya.
         DIPERLUAS: Pihak Terkait dan Amicus Curiae turut memberikan pandangan.
         """
@@ -850,9 +850,9 @@ class SimulationOrchestrator:
 
         # === PIHAK TERKAIT (ROADMAP Fase 2 #2) ===
         if self.include_pihak_terkait and self.pihak_terkait:
-            print(f"\n{'─'*40}")
+            print(f"\n{'-'*40}")
             print(f"  >>> KETERANGAN PIHAK TERKAIT")
-            print(f"{'─'*40}")
+            print(f"{'-'*40}")
 
             pihak_terkait_a = await self._generate_agent_response(
                 self.pihak_terkait,
@@ -876,9 +876,9 @@ class SimulationOrchestrator:
 
         # === AMICUS CURIAE (ROADMAP Fase 2 #2) ===
         if self.include_amicus and self.amicus_curiae:
-            print(f"\n{'─'*40}")
+            print(f"\n{'-'*40}")
             print(f"  >>> PANDANGAN AMICUS CURIAE")
-            print(f"{'─'*40}")
+            print(f"{'-'*40}")
 
             amicus_a = await self._generate_agent_response(
                 self.amicus_curiae,
@@ -975,9 +975,9 @@ class SimulationOrchestrator:
         await self._validated_log(round_name, self.pemerintah.name, pemerintah_kesimpulan)
 
         # ===== RPH: Setiap Hakim Scoring Independen =====
-        print(f"\n{'─'*60}")
+        print(f"\n{'-'*60}")
         print(f"  >>> RAPAT PERMUSYAWARATAN HAKIM (RPH) -- TERTUTUP")
-        print(f"{'─'*60}")
+        print(f"{'-'*60}")
 
         scoring_prompt = """\
 Sebagai Hakim Konstitusi, berikan penilaian INDEPENDEN terhadap permohonan ini.
@@ -1010,7 +1010,7 @@ CONTOH OUTPUT YANG BENAR:
             raw_score = await self._generate_agent_response(hakim, scoring_prompt)
             score_data = self._parse_json_score(raw_score, hakim.name)
 
-            # Retry jika parsing gagal — minta hakim output JSON saja
+            # Retry jika parsing gagal - minta hakim output JSON saja
             if "error" in score_data:
                 logger.warning(f"Retry RPH untuk {hakim.name}: {score_data['error']}")
                 retry_prompt = (
@@ -1036,9 +1036,9 @@ CONTOH OUTPUT YANG BENAR:
 
         # Jika tidak unanimous (ada perbedaan suara)
         if len(voting_detail) > 1:
-            print(f"\n{'─'*60}")
+            print(f"\n{'-'*60}")
             print(f"  >>> DISSENTING / CONCURRING OPINIONS")
-            print(f"{'─'*60}")
+            print(f"{'-'*60}")
 
             for hakim, score_data in zip(self.panel_hakim, all_scores):
                 hakim_amar = score_data.get("amar", majority_amar)
@@ -1048,7 +1048,7 @@ CONTOH OUTPUT YANG BENAR:
                     opinion_type = "Dissenting Opinion"
                     self._log_interaction(
                         round_name,
-                        f"{opinion_type} — {hakim.name}",
+                        f"{opinion_type} - {hakim.name}",
                         opinion
                     )
                     self.dissenting_opinions.append({
@@ -1059,7 +1059,7 @@ CONTOH OUTPUT YANG BENAR:
                         "opinion": opinion
                     })
         else:
-            print(f"\n  ✅ Voting bulat — tidak ada Dissenting Opinion.")
+            print(f"\n  OK Voting bulat - tidak ada Dissenting Opinion.")
 
         return {
             "simulation_id": self.simulation_id,
@@ -1071,7 +1071,7 @@ CONTOH OUTPUT YANG BENAR:
 
 
     # ================================================================
-    # RONDE 5: UMPAN BALIK HAKIM (ROADMAP Fase 4 #8) — BARU
+    # RONDE 5: UMPAN BALIK HAKIM (ROADMAP Fase 4 #8) - BARU
     # ================================================================
     async def run_round_5_feedback(self) -> Dict[str, Any]:
         """
@@ -1094,7 +1094,7 @@ PENTING:
 
 Kembalikan HANYA format JSON berikut (tanpa teks lain):
 {
-    "skor_potensial_perbaikan": <angka 0-30 — estimasi peningkatan skor jika saran diikuti>,
+    "skor_potensial_perbaikan": <angka 0-30 - estimasi peningkatan skor jika saran diikuti>,
     "kelemahan_utama": [
         "<kelemahan spesifik 1>",
         "<kelemahan spesifik 2>"
@@ -1674,11 +1674,11 @@ Kembalikan HANYA format JSON berikut (tanpa teks lain):
         """
         Menjalankan siklus sidang penuh.
         Alur:
-          Ronde 1  → Pemeriksaan Pendahuluan
-          Ronde 2  → Perbaikan Permohonan
-          Ronde 2B → Pemeriksaan Ahli (jika include_ahli=True)
-          Ronde 3  → Pokok Perkara + Pihak Terkait + Amicus Curiae
-          Ronde 4  → Kesimpulan + RPH + Dissenting Opinion
+          Ronde 1  -> Pemeriksaan Pendahuluan
+          Ronde 2  -> Perbaikan Permohonan
+          Ronde 2B -> Pemeriksaan Ahli (jika include_ahli=True)
+          Ronde 3  -> Pokok Perkara + Pihak Terkait + Amicus Curiae
+          Ronde 4  -> Kesimpulan + RPH + Dissenting Opinion
         """
         print(f"\n\n{'>'*15} MULAI SIMULASI {self.simulation_id} {'<'*15}")
 

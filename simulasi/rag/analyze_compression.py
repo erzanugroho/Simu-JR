@@ -114,10 +114,10 @@ print(f"Min chunks/file: {min(cpf_values)}")
 
 # Estimate savings with bigger chunks
 print(f"\n=== ESTIMASI DENGAN CHUNK SIZE LEBIH BESAR ===")
-# Current: 1000 chars, 200 overlap → ~800 new chars per chunk
-# Option A: 1500 chars, 150 overlap → ~1350 new chars per chunk → 1.69x fewer chunks
-# Option B: 2000 chars, 200 overlap → ~1800 new chars per chunk → 2.25x fewer chunks
-# Option C: 2000 chars, 100 overlap → ~1900 new chars per chunk → 2.375x fewer chunks
+# Current: 1000 chars, 200 overlap -> ~800 new chars per chunk
+# Option A: 1500 chars, 150 overlap -> ~1350 new chars per chunk -> 1.69x fewer chunks
+# Option B: 2000 chars, 200 overlap -> ~1800 new chars per chunk -> 2.25x fewer chunks
+# Option C: 2000 chars, 100 overlap -> ~1900 new chars per chunk -> 2.375x fewer chunks
 
 current_eff = 1000 - 200  # 800 new chars per chunk
 for new_size, new_overlap in [(1500, 150), (2000, 200), (2000, 100), (2000, 0)]:

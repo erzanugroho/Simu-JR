@@ -1,5 +1,5 @@
 """
-Unit Tests — Agent Classes
+Unit Tests - Agent Classes
 ============================
 Tests for BaseAgent, role-specific agents, memory management, thinking filter, 
 word limiter, and validator logic. No LLM calls are made.

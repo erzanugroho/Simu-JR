@@ -164,7 +164,7 @@ def process_pdf(pdf_path: str, jenis: str) -> list:
             return []
 
         # Atur strategi pemotongan teks (Chunking)
-        # 2000 karakter per chunk dengan overlap 100 — lebih sedikit chunks,
+        # 2000 karakter per chunk dengan overlap 100 - lebih sedikit chunks,
         # lebih banyak konteks per chunk, overlap minimal untuk continuity
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=2000,
@@ -232,7 +232,7 @@ def main():
                         # Tulis baris per baris (JSONL)
                         f_out.write(json.dumps(chunk, ensure_ascii=False) + '\n')
 
-    print("\n✅ Proses Ekstraksi dan Chunking Selesai!")
+    print("\nOK Proses Ekstraksi dan Chunking Selesai!")
     print(f"File database mentah tersimpan di: {OUTPUT_JSONL}")
     
     # Opsional: Cek ukuran file

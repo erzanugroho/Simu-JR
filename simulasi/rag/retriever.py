@@ -65,7 +65,7 @@ class RAGRetriever:
                 raise FileNotFoundError(f"Chroma SQLite tidak ditemukan: {self.sqlite_path}")
             stats = self.get_stats()
             logger.info(
-                f"✅ Collection '{collection_name}' terhubung via SQLite keyword backend. "
+                f"OK Collection '{collection_name}' terhubung via SQLite keyword backend. "
                 f"Total vectors: {stats['total_vectors']:,}"
             )
             return
@@ -97,7 +97,7 @@ class RAGRetriever:
         # Urutan ini menghindari konflik DLL pyarrow/pandas pada Windows.
         self.client = chromadb.PersistentClient(path=db_path)
 
-        # Inisialisasi Re-ranker (Cross-Encoder) — lazy import to avoid DLL conflict
+        # Inisialisasi Re-ranker (Cross-Encoder) - lazy import to avoid DLL conflict
         self.use_reranker = use_reranker
         self.reranker_model = rerank_model
         self.reranker_device = device
@@ -115,9 +115,9 @@ class RAGRetriever:
         try:
             self.collection = self.client.get_collection(name=collection_name)
             total = self.collection.count()
-            logger.info(f"✅ Collection '{collection_name}' terhubung. Total vectors: {total:,}")
+            logger.info(f"OK Collection '{collection_name}' terhubung. Total vectors: {total:,}")
         except Exception as e:
-            logger.error(f"❌ Gagal mengakses collection '{collection_name}': {e}")
+            logger.error(f"FAILED Gagal mengakses collection '{collection_name}': {e}")
             raise
 
     def _semantic_query_embeddings(self, texts: List[str]) -> List[List[float]]:
@@ -440,13 +440,13 @@ class RAGRetriever:
             if not base:
                 return ""
             wrapped = (
-                "════════════════════════════════════════\n"
-                "📚 REFERENSI HUKUM DARI DATABASE MK:\n"
+                "========================================\n"
+                " REFERENSI HUKUM DARI DATABASE MK:\n"
                 "(Gunakan informasi di bawah ini untuk memperkuat argumen Anda. "
                 "Kutip nomor putusa/pasal secara akurat.)\n"
-                "════════════════════════════════════════\n\n"
+                "========================================\n\n"
                 f"{base}\n\n"
-                "═══════════════════════════════════════\n"
+                "=======================================\n"
             )
             # Cache and return
             self._query_cache[key] = wrapped
@@ -485,13 +485,13 @@ class RAGRetriever:
             wrapped = ""
         else:
             wrapped = (
-                "════════════════════════════════════════\n"
-                "📚 REFERENSI HUKUM DARI DATABASE MK:\n"
+                "========================================\n"
+                " REFERENSI HUKUM DARI DATABASE MK:\n"
                 "(Gunakan informasi di bawah ini untuk memperkuat argumen Anda. "
                 "Kutip nomor putusa/pasal secara akurat.)\n"
-                "════════════════════════════════════════\n\n"
+                "========================================\n\n"
                 f"{combined}\n\n"
-                "═══════════════════════════════════════\n"
+                "=======================================\n"
             )
 
         # Cache and return
@@ -551,22 +551,22 @@ class RAGRetriever:
         }
 
     def query_ratio_bank(self, query: str, n_results: int = 3) -> str:
-        """Query ke mk_ratio_bank — ratio decidendi terstruktur."""
+        """Query ke mk_ratio_bank - ratio decidendi terstruktur."""
         result = self._query_collection("mk_ratio_bank", query, n_results)
         return result["context_text"]
 
     def query_attack_bank(self, query: str, n_results: int = 3) -> str:
-        """Query ke mk_attack_bank — argumen Pemerintah/DPR."""
+        """Query ke mk_attack_bank - argumen Pemerintah/DPR."""
         result = self._query_collection("mk_attack_bank", query, n_results)
         return result["context_text"]
 
     def query_concern_bank(self, query: str, n_results: int = 3) -> str:
-        """Query ke mk_concern_bank — pertanyaan/concern hakim."""
+        """Query ke mk_concern_bank - pertanyaan/concern hakim."""
         result = self._query_collection("mk_concern_bank", query, n_results)
         return result["context_text"]
 
     def query_survive_bank(self, query: str, n_results: int = 3) -> str:
-        """Query ke mk_survive_bank — jawaban Pemohon yang survive."""
+        """Query ke mk_survive_bank - jawaban Pemohon yang survive."""
         result = self._query_collection("mk_survive_bank", query, n_results)
         return result["context_text"]
 
@@ -613,11 +613,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     retriever = RAGRetriever()
 
-    print(f"\n📊 Stats: {retriever.get_stats()}\n")
+    print(f"\n Stats: {retriever.get_stats()}\n")
 
     test_query = "legal standing pemohon dalam pengujian UU ITE"
-    print(f"🔍 Query: '{test_query}'\n")
+    print(f" Query: '{test_query}'\n")
 
     result = retriever.query(test_query, n_results=3)
     print(result["context_text"][:2000])
-    print(f"\n📎 Sources: {result['sources']}")
+    print(f"\n Sources: {result['sources']}")

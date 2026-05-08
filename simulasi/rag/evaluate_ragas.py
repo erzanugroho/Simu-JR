@@ -1,5 +1,5 @@
 """
-RAG Evaluation Module — RAGAS Metrics
+RAG Evaluation Module - RAGAS Metrics
 ======================================
 Mengukur kualitas retrieval pipeline menggunakan RAGAS framework:
   - context_precision   : Seberapa relevan chunk yang di-retrieve
@@ -47,7 +47,7 @@ TARGET_CONTEXT_RECALL = 0.6
 
 
 # ============================================================================
-# EVALUATION DATASET — 30 pertanyaan hukum konstitusi + ground truth
+# EVALUATION DATASET - 30 pertanyaan hukum konstitusi + ground truth
 # ============================================================================
 
 DEFAULT_EVAL_DATASET: List[Dict[str, Any]] = [
@@ -138,7 +138,7 @@ DEFAULT_EVAL_DATASET: List[Dict[str, Any]] = [
     # --- Prosedur & Putusan (10 pertanyaan) ---
     {
         "question": "Apa tahapan pemeriksaan dalam sidang PUU di MK?",
-        "ground_truth": "Tahapan pemeriksaan PUU: (1) Pemeriksaan Pendahuluan — uji legal standing, (2) Perbaikan Permohonan — nasihat dari Majelis, (3) Pemeriksaan Ahli — keterangan ahli dari kedua pihak, (4) Pokok Perkara — argumen substansi, (5) Kesimpulan & RPH — Rapat Permusyawaratan Hakim, (6) Pengucapan Putusan."
+        "ground_truth": "Tahapan pemeriksaan PUU: (1) Pemeriksaan Pendahuluan - uji legal standing, (2) Perbaikan Permohonan - nasihat dari Majelis, (3) Pemeriksaan Ahli - keterangan ahli dari kedua pihak, (4) Pokok Perkara - argumen substansi, (5) Kesimpulan & RPH - Rapat Permusyawaratan Hakim, (6) Pengucapan Putusan."
     },
     {
         "question": "Bagaimana mekanisme Rapat Permusyawaratan Hakim (RPH)?",
@@ -146,7 +146,7 @@ DEFAULT_EVAL_DATASET: List[Dict[str, Any]] = [
     },
     {
         "question": "Apa jenis-jenis amar putusan MK dalam PUU?",
-        "ground_truth": "Amar putusan MK dalam PUU: (1) Dikabulkan — norma dinyatakan inkonstitusional, (2) Ditolak — norma dinyatakan konstitusional, (3) Tidak Dapat Diterima — legal standing tidak terpenuhi, (4) Dikabulkan Sebagian — sebagian norma inkonstitusional, sebagian lain konstitusional."
+        "ground_truth": "Amar putusan MK dalam PUU: (1) Dikabulkan - norma dinyatakan inkonstitusional, (2) Ditolak - norma dinyatakan konstitusional, (3) Tidak Dapat Diterima - legal standing tidak terpenuhi, (4) Dikabulkan Sebagian - sebagian norma inkonstitusional, sebagian lain konstitusional."
     },
     {
         "question": "Bagaimana Dissenting Opinion bekerja di MK?",
@@ -222,7 +222,7 @@ async def evaluate_context_precision(
     Context Precision: Seberapa banyak chunk yang di-retrieve benar-benar
     relevan dengan pertanyaan dan ground truth.
 
-    Score: 0.0 (tidak relevan) — 1.0 (semua chunk relevan)
+    Score: 0.0 (tidak relevan) - 1.0 (semua chunk relevan)
     """
     prompt = f"""
 Anda adalah evaluator retrieval sistem. Tugas Anda menilai seberapa relevan
@@ -277,7 +277,7 @@ async def evaluate_context_recall(
     Context Recall: Seberapa lengkap informasi dari ground truth
 tercakup dalam chunk yang di-retrieve.
 
-    Score: 0.0 (tidak ada informasi yang relevan) — 1.0 (semua informasi tercakup)
+    Score: 0.0 (tidak ada informasi yang relevan) - 1.0 (semua informasi tercakup)
     """
     prompt = f"""
 Anda adalah evaluator retrieval sistem. Tugas Anda menilai seberapa lengkap
@@ -326,7 +326,7 @@ async def evaluate_answer_relevancy(
     """
     Answer Relevancy: Seberapa relevan dan langsung menjawab pertanyaan.
 
-    Score: 0.0 (tidak relevan) — 1.0 (sangat relevan dan langsung menjawab)
+    Score: 0.0 (tidak relevan) - 1.0 (sangat relevan dan langsung menjawab)
     """
     prompt = f"""
 Anda adalah evaluator. Nilai seberapa relevan jawaban berikut terhadap pertanyaan.
@@ -365,7 +365,7 @@ async def evaluate_faithfulness(
     Faithfulness: Apakah jawaban setia terhadap konteks yang di-retrieve
     (tidak hallucinate informasi yang tidak ada di konteks).
 
-    Score: 0.0 (banyak hallucination) — 1.0 (semua klaim didukung konteks)
+    Score: 0.0 (banyak hallucination) - 1.0 (semua klaim didukung konteks)
     """
     combined_context = "\n\n".join(ctx[:400] for ctx in retrieved_contexts)
 
@@ -487,7 +487,7 @@ class RAGEvaluator:
 
     async def run_full_evaluation(self) -> Dict[str, Any]:
         """Jalankan evaluasi lengkap untuk semua pertanyaan."""
-        logger.info(f"🚀 Memulai RAG Evaluation ({len(self.dataset)} questions)...")
+        logger.info(f" Memulai RAG Evaluation ({len(self.dataset)} questions)...")
 
         for i, item in enumerate(self.dataset):
             logger.info(
@@ -559,12 +559,12 @@ class RAGEvaluator:
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report, f, indent=2, ensure_ascii=False)
 
-        logger.info(f"📄 Report saved to: {report_path}")
+        logger.info(f" Report saved to: {report_path}")
         return str(report_path)
 
 
 # ============================================================================
-# QUICK EVAL — Tanpa RAGAS library (menggunakan LLM sebagai judge)
+# QUICK EVAL - Tanpa RAGAS library (menggunakan LLM sebagai judge)
 # ============================================================================
 
 async def quick_eval(retriever: Any = None, sample_size: int = 10) -> Dict[str, Any]:
@@ -586,7 +586,7 @@ async def quick_eval(retriever: Any = None, sample_size: int = 10) -> Dict[str, 
 def print_report(report: Dict[str, Any]) -> None:
     """Cetak report ke console dengan format rapi."""
     print("\n" + "=" * 70)
-    print("  📊 RAG EVALUATION REPORT")
+    print("   RAG EVALUATION REPORT")
     print("=" * 70)
 
     print(f"\n  Timestamp       : {report.get('timestamp', '-')}")
@@ -603,7 +603,7 @@ def print_report(report: Dict[str, Any]) -> None:
         target_info = targets.get(metric_name, {})
         target_val = target_info.get("target", "-")
         passed = target_info.get("passed", False)
-        status = "✅ PASS" if passed else "❌ FAIL"
+        status = "OK PASS" if passed else "FAILED FAIL"
         print(f"  {metric_name:<23} {score:<10.4f} {str(target_val):<10} {status:<10}")
 
     for metric_name in ["answer_relevancy", "faithfulness"]:
@@ -621,7 +621,7 @@ def print_report(report: Dict[str, Any]) -> None:
     # Overall
     overall = report.get("overall_passed", False)
     print(f"\n  {'='*55}")
-    print(f"  OVERALL: {'✅ ALL TARGETS PASSED' if overall else '❌ SOME TARGETS FAILED'}")
+    print(f"  OVERALL: {'OK ALL TARGETS PASSED' if overall else 'FAILED SOME TARGETS FAILED'}")
     print(f"  {'='*55}\n")
 
 
@@ -642,7 +642,7 @@ async def main():
     if args.build_dataset:
         with open(EVAL_DATASET_PATH, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_EVAL_DATASET, f, indent=2, ensure_ascii=False)
-        print(f"✅ Eval dataset saved to {EVAL_DATASET_PATH}")
+        print(f"OK Eval dataset saved to {EVAL_DATASET_PATH}")
         print(f"   Total questions: {len(DEFAULT_EVAL_DATASET)}")
         return
 
@@ -654,7 +654,7 @@ async def main():
                 report = json.load(f)
             print_report(report)
         else:
-            print("❌ No reports found. Run evaluation first.")
+            print("FAILED No reports found. Run evaluation first.")
         return
 
     # Determine sample size
@@ -668,9 +668,9 @@ async def main():
         from retriever import RAGRetriever
         retriever = RAGRetriever()
         stats = retriever.get_stats()
-        logger.info(f"📚 RAG connected: {stats['total_vectors']:,} vectors")
+        logger.info(f" RAG connected: {stats['total_vectors']:,} vectors")
     except Exception as e:
-        logger.warning(f"⚠️ RAG not available: {e}. Running offline evaluation.")
+        logger.warning(f"WARNING RAG not available: {e}. Running offline evaluation.")
 
     # Run evaluation
     report = await quick_eval(retriever=retriever, sample_size=sample_size)

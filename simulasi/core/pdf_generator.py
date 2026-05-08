@@ -1,5 +1,5 @@
 """
-PDF Generator — Putusan MK Simulasi
+PDF Generator - Putusan MK Simulasi
 =====================================
 Generate dokumen PDF putusan Mahkamah Konstitusi dari hasil simulasi.
 """
@@ -303,7 +303,7 @@ def generate_putusan_pdf(result: Dict[str, Any]) -> bytes:
             hakim = _escape_xml(op.get("hakim", "-"))
             op_type = _escape_xml(op.get("type", "Dissenting Opinion"))
             opinion = _escape_xml(op.get("opinion", ""))
-            story.append(Paragraph(f"<b>{op_type} — {hakim}</b>", styles['Speaker']))
+            story.append(Paragraph(f"<b>{op_type} - {hakim}</b>", styles['Speaker']))
             story.append(Paragraph(opinion, styles['TranscriptText']))
             story.append(Spacer(1, 3 * mm))
 
@@ -313,7 +313,7 @@ def generate_putusan_pdf(result: Dict[str, Any]) -> bytes:
         story.append(Spacer(1, 6 * mm))
         story.append(Paragraph("VI. PERTIMBANGAN HAKIM", styles['BabTitle']))
         for c in catatan:
-            story.append(Paragraph(f"• {_escape_xml(str(c))}", styles['IsiText']))
+            story.append(Paragraph(f"- {_escape_xml(str(c))}", styles['IsiText']))
 
     # === VII. REKOMENDASI ===
     feedback = result.get("feedback", {})

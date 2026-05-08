@@ -1,8 +1,8 @@
 """
-Rebuild All — Script terpadu untuk rebuild RAG database + intelligence banks.
+Rebuild All - Script terpadu untuk rebuild RAG database + intelligence banks.
 
 Urutan rebuild:
-  1. Kompresi JSONL (dedup + clean) — skip jika sudah ada compressed
+  1. Kompresi JSONL (dedup + clean) - skip jika sudah ada compressed
   2. Rebuild mk_knowledge_base dari compressed JSONL
   3. Run intelligence pipelines (ratio_bank, attack_bank, concern_bank, survive_bank)
 
@@ -187,28 +187,28 @@ def rebuild_intelligence_banks():
     logger.info("INTELLIGENCE PIPELINES")
     logger.info("=" * 60)
     
-    # 1. Ratio Bank (Agent 2) — putusan prioritas
+    # 1. Ratio Bank (Agent 2) - putusan prioritas
     logger.info("\n[1/4] Ratio Pipeline (Agent 2)...")
     try:
         run_ratio_pipeline(jsonl_path=jsonl_path, priority_only=True, workers=1)
     except Exception as e:
         logger.error(f"Ratio pipeline error: {e}")
     
-    # 2. Attack Bank (Agent 3) — argumen DPR dari risalah
+    # 2. Attack Bank (Agent 3) - argumen DPR dari risalah
     logger.info("\n[2/4] Attack Bank Pipeline (Agent 3)...")
     try:
         run_attack_bank_pipeline(jsonl_path=jsonl_path, workers=1)
     except Exception as e:
         logger.error(f"Attack pipeline error: {e}")
     
-    # 3. Concern Bank (Agent 4) — pertanyaan hakim dari risalah
+    # 3. Concern Bank (Agent 4) - pertanyaan hakim dari risalah
     logger.info("\n[3/4] Judge Concern Pipeline (Agent 4)...")
     try:
         run_judge_concern_pipeline(jsonl_path=jsonl_path, workers=1)
     except Exception as e:
         logger.error(f"Concern pipeline error: {e}")
     
-    # 4. Survive Bank (Agent 5) — jawaban pemohon yang survive
+    # 4. Survive Bank (Agent 5) - jawaban pemohon yang survive
     logger.info("\n[4/4] Survive Pipeline (Agent 5)...")
     try:
         run_survive_pipeline(jsonl_path=jsonl_path, workers=1)

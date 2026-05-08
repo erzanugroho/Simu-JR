@@ -1,5 +1,5 @@
 """
-hf_train.py — Stable Fine-Tuning Script for Windows + RTX 3090
+hf_train.py - Stable Fine-Tuning Script for Windows + RTX 3090
 ================================================================
 Mendukung:
   - Model kecil (0.5B) untuk tes alur (flow test)
@@ -170,7 +170,7 @@ def load_model_safe(model_name: str, load_mode: str) -> AutoModelForCausalLM:
     yang bisa memicu TDR (Timeout Detection and Recovery) pada model besar.
     
     Solusi:
-      - 'auto': device_map="auto" dengan max_memory — biarkan accelerate 
+      - 'auto': device_map="auto" dengan max_memory - biarkan accelerate 
         mendistribusikan layer secara bertahap antara CPU dan GPU.
       - 'cpu_first': Muat seluruhnya di CPU, lalu pindahkan ke GPU.
       - 'direct': Langsung ke GPU (hanya untuk model kecil).
@@ -293,7 +293,7 @@ print("  Gradient checkpointing enabled.")
 
 
 # ============================================================
-#  4. Load Dataset (Pandas — Windows Stable)
+#  4. Load Dataset (Pandas - Windows Stable)
 # ============================================================
 print(f"\nLoading dataset from {DATASET_PATH} via Pandas...")
 

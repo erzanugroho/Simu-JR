@@ -1,5 +1,5 @@
 """
-Web Server — Simulasi Sidang MK
+Web Server - Simulasi Sidang MK
 =================================
 FastAPI backend yang menyajikan UI dan streaming transcript sidang secara real-time.
 """
@@ -155,7 +155,7 @@ async def lifespan(app: FastAPI):
     try:
         result = await asyncio.to_thread(migrate_legacy_simulations)
         if result:
-            logger.info(f"Migrasi legacy simulations → Proyek Default ({result})")
+            logger.info(f"Migrasi legacy simulations -> Proyek Default ({result})")
     except Exception as e:
         logger.warning(f"Gagal migrasi legacy simulations: {e}")
     yield
@@ -435,7 +435,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-# Serve React build (frontend/dist) — primary UI
+# Serve React build (frontend/dist) - primary UI
 FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
 
 if FRONTEND_DIST.exists():
@@ -573,7 +573,7 @@ async def run_simulation(request: Request):
     hearing_mode = body.get("hearing_mode") or SimulationOrchestrator.DEFAULT_HEARING_MODE
     target_turn_range = body.get("target_turn_range")
 
-    logger.info(f"🚀 Memulai simulasi dengan provider: {llm_config.get('provider')}, model: {llm_config.get('model_name')}, mode: {mode}")
+    logger.info(f" Memulai simulasi dengan provider: {llm_config.get('provider')}, model: {llm_config.get('model_name')}, mode: {mode}")
 
     # Relax draft check for reconnections
     if simulation_id not in active_simulations and not draft.strip():
@@ -611,7 +611,7 @@ async def run_simulation(request: Request):
         )
 
     async def event_stream():
-        """Generator SSE — kirim setiap interaksi ke client secara real-time menggunakan queue."""
+        """Generator SSE - kirim setiap interaksi ke client secara real-time menggunakan queue."""
         q = asyncio.Queue()
         
         # Inisialisasi list queue dan transcript untuk ID ini jika belum ada
@@ -697,7 +697,7 @@ async def run_simulation(request: Request):
             yield _sse_event("done", {})
 
         except asyncio.CancelledError:
-            logger.warning(f"⚠️ Listener {simulation_id} terputus.")
+            logger.warning(f"WARNING Listener {simulation_id} terputus.")
         finally:
             # Cleanup: hapus queue listener ini
             if simulation_id in simulation_queues and q in simulation_queues[simulation_id]:
@@ -730,7 +730,7 @@ async def _stop_simulation_task(simulation_id: str) -> Dict[str, str]:
     
     if task and not task.done():
         task.cancel()
-        logger.info(f"🛑 Simulasi {simulation_id} dibatalkan paksa.")
+        logger.info(f"STOP Simulasi {simulation_id} dibatalkan paksa.")
         active_simulations.pop(simulation_id, None)
         active_orchestrators.pop(simulation_id, None)
         return {"status": "stopping", "simulation_id": simulation_id}
@@ -1186,7 +1186,7 @@ async def run_self_correcting(request: Request):
                     yield _sse_event(event_type, data)
                 except asyncio.TimeoutError:
                     yield _sse_event("status", {
-                        "message": "Auto-Correct masih berjalan — menunggu respons agen/RAG...",
+                        "message": "Auto-Correct masih berjalan - menunggu respons agen/RAG...",
                         "phase": "running"
                     })
                     yield ": keep-alive\n\n"
@@ -2471,7 +2471,7 @@ class StreamingOrchestrator(SimulationOrchestrator):
             response = await asyncio.wait_for(input_task, timeout=510.0)
             return response
         except asyncio.TimeoutError:
-            return "[Waktu habis — Pemohon tidak memberikan respons]"
+            return "[Waktu habis - Pemohon tidak memberikan respons]"
 
         finally:
             for task in (input_task, suggestions_task):
@@ -3013,7 +3013,7 @@ async def api_list_project_research(project_id: str):
 
 @app.post("/api/projects/{project_id}/research")
 async def api_run_research(project_id: str, request: Request):
-    """Jalankan research query via RAG — streaming SSE agar respons tidak terpotong."""
+    """Jalankan research query via RAG - streaming SSE agar respons tidak terpotong."""
     project = get_project(project_id)
     if not project:
         return JSONResponse({"error": f"Project '{project_id}' tidak ditemukan"}, status_code=404)

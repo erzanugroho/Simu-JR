@@ -1,5 +1,5 @@
 """
-Self-Correcting Loop — Close Loop Draft Revision
+Self-Correcting Loop - Close Loop Draft Revision
 =================================================
 Modul untuk menjalankan simulasi sidang berulang kali dengan revisi draft
 otomatis sampai draft diterima atau mencapai batas maksimal loop.
@@ -8,7 +8,7 @@ Alur:
   1. User input draft
   2. Jalankan simulasi sidang
   3. Evaluasi hasil (amar + skor)
-  4. Jika ditolak → revisi draft berdasarkan transcript & feedback
+  4. Jika ditolak -> revisi draft berdasarkan transcript & feedback
   5. Ulangi dari langkah 2 dengan draft revisi
   6. Simpan log setiap iterasi
 """
@@ -83,7 +83,7 @@ class SelfCorrectingLoop:
         if not self.retriever:
             try:
                 from rag.retriever import RAGRetriever
-                logger.info("📚 Memuat RAG retriever lazy untuk konteks revisi draft...")
+                logger.info(" Memuat RAG retriever lazy untuk konteks revisi draft...")
                 self.retriever = RAGRetriever()
             except Exception as e:
                 logger.warning(f"Konteks risalah/attack bank tidak tersedia untuk revisi: {e}")
@@ -149,9 +149,9 @@ class SelfCorrectingLoop:
 
         while self.current_loop < self.max_loops:
             self.current_loop += 1
-            logger.info(f"\n{'─' * 60}")
+            logger.info(f"\n{'-' * 60}")
             logger.info(f"  LOOP #{self.current_loop} / {self.max_loops}")
-            logger.info(f"{'─' * 60}")
+            logger.info(f"{'-' * 60}")
 
             self._emit("loop_started", {
                 "loop": self.current_loop,
@@ -160,7 +160,7 @@ class SelfCorrectingLoop:
             })
 
             # 1. Jalankan simulasi dengan draft saat ini
-            logger.info(f"📄 Draft: {self.current_draft[:80]}...")
+            logger.info(f" Draft: {self.current_draft[:80]}...")
             
             async def chunk_callback(role, chunk):
                 self._emit("transcript_chunk", {
@@ -196,7 +196,7 @@ class SelfCorrectingLoop:
             }
             self.loop_history.append(loop_record)
 
-            logger.info(f"\n  📊 Hasil Loop #{self.current_loop}:")
+            logger.info(f"\n   Hasil Loop #{self.current_loop}:")
             if scores and not scores.get("error"):
                 logger.info(f"     Total Skor: {scores.get('total', 0)}/100")
                 logger.info(f"     Amar: {scores.get('amar', 'unknown')}")
@@ -213,7 +213,7 @@ class SelfCorrectingLoop:
             if accepted:
                 self._save_loop_log(loop_record)
                 logger.info(f"\n{'=' * 60}")
-                logger.info(f"  LOOP BERHASIL — Draft diterima pada iterasi #{self.current_loop}")
+                logger.info(f"  LOOP BERHASIL - Draft diterima pada iterasi #{self.current_loop}")
                 logger.info(f"{'=' * 60}")
                 self._emit("loop_accepted", {
                     "loop": self.current_loop,
@@ -221,9 +221,9 @@ class SelfCorrectingLoop:
                 })
                 return self._build_final_result(success=True)
 
-            # 4. Jika masih ditolak dan belum max loop → revisi draft
+            # 4. Jika masih ditolak dan belum max loop -> revisi draft
             if self.current_loop < self.max_loops:
-                logger.info(f"\n  🔄 Draft ditolak. Memulai revisi otomatis...")
+                logger.info(f"\n   Draft ditolak. Memulai revisi otomatis...")
                 self._emit("revision_started", {
                     "loop": self.current_loop,
                     "next_loop": self.current_loop + 1,
@@ -241,7 +241,7 @@ class SelfCorrectingLoop:
                 )
 
                 if "error" in revision:
-                    logger.error(f"  ❌ Gagal merevisi draft: {revision['error']}")
+                    logger.error(f"  FAILED Gagal merevisi draft: {revision['error']}")
                     # Lanjutkan dengan draft yang sama jika revisi gagal
                     loop_record["revision_error"] = revision["error"]
                     self._emit("revision_error", {"loop": self.current_loop, "error": revision["error"]})
@@ -252,11 +252,11 @@ class SelfCorrectingLoop:
                     old_hash = hashlib.sha256(self.current_draft.strip().encode("utf-8")).hexdigest()
                     new_hash = hashlib.sha256(str(new_draft).strip().encode("utf-8")).hexdigest()
 
-                    logger.info(f"  ✅ Draft revisi berhasil dibuat.")
+                    logger.info(f"  OK Draft revisi berhasil dibuat.")
                     if changes:
-                        logger.info(f"  📝 Perubahan:")
+                        logger.info(f"   Perubahan:")
                         for c in changes:
-                            logger.info(f"     • {c}")
+                            logger.info(f"     - {c}")
 
                     loop_record["revision"] = {
                         "ringkasan_perubahan": changes,
@@ -280,7 +280,7 @@ class SelfCorrectingLoop:
                 self._save_loop_log(loop_record)
             else:
                 self._save_loop_log(loop_record)
-                logger.info(f"\n  ⛔ Max loop ({self.max_loops}) tercapai.")
+                logger.info(f"\n   Max loop ({self.max_loops}) tercapai.")
                 self._emit("max_loop_reached", {
                     "loop": self.current_loop,
                     "max_loops": self.max_loops
@@ -288,7 +288,7 @@ class SelfCorrectingLoop:
 
         # Max loop tercapai tanpa diterima
         logger.info(f"\n{'=' * 60}")
-        logger.info(f"  LOOP SELESAI — Draft belum diterima setelah {self.max_loops} iterasi")
+        logger.info(f"  LOOP SELESAI - Draft belum diterima setelah {self.max_loops} iterasi")
         logger.info(f"{'=' * 60}")
         return self._build_final_result(success=False)
 
@@ -301,7 +301,7 @@ class SelfCorrectingLoop:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(loop_record, f, ensure_ascii=False, indent=2)
 
-        logger.info(f"  💾 Log disimpan: {filepath}")
+        logger.info(f"   Log disimpan: {filepath}")
 
     def _build_final_result(self, success: bool) -> Dict[str, Any]:
         """Bangun hasil akhir dari seluruh loop."""
@@ -333,6 +333,6 @@ class SelfCorrectingLoop:
         summary_path = self.log_dir / "summary.json"
         with open(summary_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
-        logger.info(f"  📋 Ringkasan disimpan: {summary_path}")
+        logger.info(f"   Ringkasan disimpan: {summary_path}")
 
         return result

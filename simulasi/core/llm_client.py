@@ -1,5 +1,5 @@
 """
-LLM Client Configuration — Simulasi Sidang MK
+LLM Client Configuration - Simulasi Sidang MK
 ==============================================
 Konfigurasi dan inisialisasi LLM client (OpenAI-compatible, OpenRouter, Claude).
 Dipisahkan dari agents.py untuk memudahkan maintenance dan testing.

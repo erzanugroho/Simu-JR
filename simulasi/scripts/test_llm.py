@@ -24,11 +24,11 @@ def test():
         print("\n3. Mencoba Ekstraksi JSON...")
         result = extract_json_from_text(raw)
         if result:
-            print("✅ BERHASIL: ", result)
+            print("OK BERHASIL: ", result)
         else:
-            print("❌ GAGAL EKSTRAKSI JSON")
+            print("FAILED GAGAL EKSTRAKSI JSON")
     else:
-        print("\n❌ GAGAL: AI tidak memberikan respon.")
+        print("\nFAILED GAGAL: AI tidak memberikan respon.")
 
 if __name__ == "__main__":
     test()

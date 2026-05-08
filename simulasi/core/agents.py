@@ -1,5 +1,5 @@
 """
-Agent Module — Simulasi Sidang MK
+Agent Module - Simulasi Sidang MK
 ==================================
 Agen AI yang merepresentasikan para pihak dalam sidang Mahkamah Konstitusi.
 Dilengkapi dengan:
@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_MAX_HISTORY = 20  # Sliding window: simpan N pesan terakhir
 
 # === Token/Word Limiter Config (ROADMAP Fase 3 #5) ===
-# Batas kata per respons — Hakim akan menginterupsi jika melebihi batas
+# Batas kata per respons - Hakim akan menginterupsi jika melebihi batas
 # Disesuaikan dengan risalah sidang MK asli (rata-rata 10-180 kata per turn)
 WORD_LIMITS = {
     "pemohon": 75,
@@ -70,10 +70,10 @@ WORD_LIMITS = {
     "riset_hukum": None,    # Tidak dibatasi: riset hukum butuh jawaban komprehensif
 }
 INTERRUPTION_NOTICES = [
-    "\n\n[...DIPOTONG — Ketua Majelis: 'Saudara, waktu Anda telah habis. Harap simpulkan poin Anda secara singkat.']",
-    "\n\n[...DIPOTONG — Ketua Majelis: 'Saudara, mohon singkat. Waktu sudah habis.']",
-    "\n\n[...DIPOTONG — Ketua Majelis: 'Terima kasih, Saudara. Waktu sudah cukup.']",
-    "\n\n[...DIPOTONG — Ketua Majelis: 'Saudara, tolong langsung ke kesimpulan saja.']",
+    "\n\n[...DIPOTONG - Ketua Majelis: 'Saudara, waktu Anda telah habis. Harap simpulkan poin Anda secara singkat.']",
+    "\n\n[...DIPOTONG - Ketua Majelis: 'Saudara, mohon singkat. Waktu sudah habis.']",
+    "\n\n[...DIPOTONG - Ketua Majelis: 'Terima kasih, Saudara. Waktu sudah cukup.']",
+    "\n\n[...DIPOTONG - Ketua Majelis: 'Saudara, tolong langsung ke kesimpulan saja.']",
 ]
 INTERRUPTION_NOTICE = INTERRUPTION_NOTICES[0]
 
@@ -97,7 +97,7 @@ if os.path.exists(UUD_PATH):
     except Exception as e:
         logger.error(f"Gagal memuat UUD 1945: {e}")
 
-# Ringkasan pendek untuk system prompt (tanpa full text — hemat ~10K token per call)
+# Ringkasan pendek untuk system prompt (tanpa full text - hemat ~10K token per call)
 UUD_PROMPT_ADDITION = """
 ============================================================
 REFERENSI: UUD NRI 1945 (BATU UJI)
@@ -684,7 +684,7 @@ class BaseAgent:
         if rag_context:
             full_prompt = (
                 f"{rag_context}\n\n"
-                f"═══ INSTRUKSI ═══\n"
+                f"=== INSTRUKSI ===\n"
                 f"{prompt}"
             )
 
@@ -775,7 +775,7 @@ class BaseAgent:
             return answer
         except Exception as e:
             logger.error(f"Error LLM pada {self.name}: {e}")
-            return f"[{self.name} mengalami gangguan — {str(e)}]"
+            return f"[{self.name} mengalami gangguan - {str(e)}]"
 
     def get_memory_stats(self) -> Dict[str, int]:
         """Informasi debug tentang memory agent."""
@@ -787,11 +787,11 @@ class BaseAgent:
 
 
 # ============================================================
-# Agent Classes — Masing-masing merepresentasikan peran sidang
+# Agent Classes - Masing-masing merepresentasikan peran sidang
 # ============================================================
 
 class PemohonAgent(BaseAgent):
-    """Kuasa Hukum Pemohon — membela permohonan Judicial Review."""
+    """Kuasa Hukum Pemohon - membela permohonan Judicial Review."""
 
     def __init__(self, temperature: float = 0.7, max_history: int = DEFAULT_MAX_HISTORY, llm_config: Optional[Dict[str, Any]] = None):
         super().__init__(
@@ -805,7 +805,7 @@ class PemohonAgent(BaseAgent):
 
 
 class PemerintahAgent(BaseAgent):
-    """Kuasa Hukum Presiden/DPR — mempertahankan konstitusionalitas UU."""
+    """Kuasa Hukum Presiden/DPR - mempertahankan konstitusionalitas UU."""
 
     def __init__(self, temperature: float = 0.7, max_history: int = DEFAULT_MAX_HISTORY, llm_config: Optional[Dict[str, Any]] = None):
         super().__init__(
@@ -819,7 +819,7 @@ class PemerintahAgent(BaseAgent):
 
 
 class HakimAgent(BaseAgent):
-    """Hakim Konstitusi — menguji argumen para pihak secara kritis dan imparsial."""
+    """Hakim Konstitusi - menguji argumen para pihak secara kritis dan imparsial."""
 
     VALID_PERSONAS = ("default", "formalis", "progresif", "positivis")
 
@@ -887,7 +887,7 @@ class PermohonanDrafterAgent(BaseAgent):
 
 
 class PihakTerkaitAgent(BaseAgent):
-    """Pihak Terkait — membela kepentingan pihak ketiga yang terdampak langsung."""
+    """Pihak Terkait - membela kepentingan pihak ketiga yang terdampak langsung."""
 
     def __init__(
         self,
@@ -906,7 +906,7 @@ class PihakTerkaitAgent(BaseAgent):
 
 
 class AmicusCuriaeAgent(BaseAgent):
-    """Amicus Curiae — memberikan pandangan akademis & komparatif yang netral."""
+    """Amicus Curiae - memberikan pandangan akademis & komparatif yang netral."""
 
     def __init__(
         self,
@@ -925,7 +925,7 @@ class AmicusCuriaeAgent(BaseAgent):
 
 
 class AhliPemohonAgent(BaseAgent):
-    """Ahli Pemohon — keterangan ahli konstitusi yang mendukung dalil Pemohon."""
+    """Ahli Pemohon - keterangan ahli konstitusi yang mendukung dalil Pemohon."""
 
     def __init__(
         self,
@@ -944,7 +944,7 @@ class AhliPemohonAgent(BaseAgent):
 
 
 class AhliPemerintahAgent(BaseAgent):
-    """Ahli Pemerintah — keterangan ahli tata negara yang mendukung konstitusionalitas UU."""
+    """Ahli Pemerintah - keterangan ahli tata negara yang mendukung konstitusionalitas UU."""
 
     def __init__(
         self,
@@ -963,7 +963,7 @@ class AhliPemerintahAgent(BaseAgent):
 
 
 class ValidatorAgent(BaseAgent):
-    """Validator Dalil — middleware anti-halusinasi yang memeriksa kutipan putusan & pasal."""
+    """Validator Dalil - middleware anti-halusinasi yang memeriksa kutipan putusan & pasal."""
 
     def __init__(
         self,
@@ -974,7 +974,7 @@ class ValidatorAgent(BaseAgent):
             role="validator",
             system_prompt=SYSTEM_PROMPT_VALIDATOR,
             temperature=0.0,       # Deterministik untuk validasi
-            max_history=5,         # Memory minimal — hanya perlu konteks pendek
+            max_history=5,         # Memory minimal - hanya perlu konteks pendek
             llm_config=llm_config,
             max_words=None
         )
@@ -1021,7 +1021,7 @@ class ValidatorAgent(BaseAgent):
                 if year < 2003 or year > 2026:
                     suspicious.append(
                         f"Putusan No. {number}/PUU-{roman}/{year_str} "
-                        f"— tahun {year} di luar rentang MK (2003-2026)"
+                        f"- tahun {year} di luar rentang MK (2003-2026)"
                     )
                     warnings.append(f"Tahun putusan mencurigakan: {year}")
             except ValueError:
@@ -1038,7 +1038,7 @@ class ValidatorAgent(BaseAgent):
 
 
 class RisetHukumAgent(BaseAgent):
-    """Agent khusus riset hukum konstitusi — tanpa word limit, tanpa truncation."""
+    """Agent khusus riset hukum konstitusi - tanpa word limit, tanpa truncation."""
 
     def __init__(
         self,

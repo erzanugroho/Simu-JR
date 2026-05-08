@@ -1,5 +1,5 @@
 """
-Template Kasus Umum — Simulasi Sidang MK
+Template Kasus Umum - Simulasi Sidang MK
 ==========================================
 Pre-built templates untuk jenis kasus yang sering diuji di Mahkamah Konstitusi.
 """

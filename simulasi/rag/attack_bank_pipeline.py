@@ -1,5 +1,5 @@
 """
-Attack Bank Pipeline — Agent 3
+Attack Bank Pipeline - Agent 3
 ==============================
 Ekstraksi argumen serangan Pemerintah/DPR dari risalah sidang ke mk_attack_bank.
 """
@@ -21,15 +21,15 @@ def run_attack_bank_pipeline(jsonl_path: str = None, priority_only: bool = True,
     Jalankan Agent 3: Ekstrak argumen serangan Pemerintah/DPR dari risalah.
     Memproses per FILE UNIK dengan ThreadPoolExecutor.
     """
-    logger.info("🚀 Memulai Attack Bank Pipeline (Agent 3)...")
+    logger.info(" Memulai Attack Bank Pipeline (Agent 3)...")
 
     system_prompt = load_prompt("agent3_attack_bank")
     if not system_prompt:
-        logger.error("❌ Prompt Agent 3 tidak ditemukan.")
+        logger.error("FAILED Prompt Agent 3 tidak ditemukan.")
         return
 
     risalah_docs = list_documents_by_type("risalah", jsonl_path, priority_only=priority_only)
-    logger.info(f"📄 Ditemukan {len(risalah_docs)} risalah chunks (priority={priority_only}).")
+    logger.info(f" Ditemukan {len(risalah_docs)} risalah chunks (priority={priority_only}).")
 
     # Group by source_file
     file_chunks: dict[str, list] = defaultdict(list)
@@ -37,7 +37,7 @@ def run_attack_bank_pipeline(jsonl_path: str = None, priority_only: bool = True,
         source = chunk.get("metadata", {}).get("source_file", "unknown")
         file_chunks[source].append(chunk)
 
-    # ── Cek file yang sudah ada di database (Resume Feature) ──
+    # -- Cek file yang sudah ada di database (Resume Feature) --
     import chromadb
     from pathlib import Path as _Path
     db_path = str(_Path(__file__).parent / "chroma_db")
@@ -46,12 +46,12 @@ def run_attack_bank_pipeline(jsonl_path: str = None, priority_only: bool = True,
         coll = chroma_client.get_collection(name="mk_attack_bank")
         existing_res = coll.get(include=["metadatas"])
         existing_files = {m.get("source_file") for m in existing_res["metadatas"] if m}
-        logger.info(f"🔍 Ditemukan {len(existing_files)} serangan yang sudah ada. Akan di-skip.")
+        logger.info(f" Ditemukan {len(existing_files)} serangan yang sudah ada. Akan di-skip.")
     except:
         existing_files = set()
 
     files_to_process = {s: c for s, c in file_chunks.items() if s not in existing_files}
-    logger.info(f"📁 File unik untuk diproses: {len(files_to_process)} (Total: {len(file_chunks)}) | workers: {workers}")
+    logger.info(f" File unik untuk diproses: {len(files_to_process)} (Total: {len(file_chunks)}) | workers: {workers}")
 
     def _process(item):
         source, chunks = item
@@ -105,7 +105,7 @@ def run_attack_bank_pipeline(jsonl_path: str = None, priority_only: bool = True,
                     [f"attack_{source}_empty"]
                 )
 
-    logger.info("✅ Attack bank pipeline selesai.")
+    logger.info("OK Attack bank pipeline selesai.")
 
 
 if __name__ == "__main__":

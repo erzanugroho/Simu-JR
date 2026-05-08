@@ -1,12 +1,12 @@
 """
-run_agent1_hybrid_classifier.py  —  MEGA-OPTIMIZED
+run_agent1_hybrid_classifier.py  -  MEGA-OPTIMIZED
 ====================================================
 Arsitektur 3 Fase:
-  Fase A – Bulk Scan  : 1 pass baca seluruh ChromaDB (120 page query, bukan 11.365)
-  Fase B – Parallel   : Regex / LLM sepenuhnya in-memory (tidak ada DB access)
-  Fase C – Bulk Write : Tulis semua update sekaligus (batch 2000, bukan 1 per chunk)
+  Fase A - Bulk Scan  : 1 pass baca seluruh ChromaDB (120 page query, bukan 11.365)
+  Fase B - Parallel   : Regex / LLM sepenuhnya in-memory (tidak ada DB access)
+  Fase C - Bulk Write : Tulis semua update sekaligus (batch 2000, bukan 1 per chunk)
 
-Estimasi waktu: ~7–12 menit untuk 11.365 file (vs 18 jam sebelumnya)
+Estimasi waktu: ~7-12 menit untuk 11.365 file (vs 18 jam sebelumnya)
 
 Penggunaan:
     python run_agent1_hybrid_classifier.py [--workers N] [--llm-fallback] [--dry-run]
@@ -229,7 +229,7 @@ def classify_with_llm(text: str, filename: str, client_llm, prompt_template: str
 
 
 # ===========================================================================
-# FASE A – BULK SCAN
+# FASE A - BULK SCAN
 # ===========================================================================
 
 def bulk_scan_chromadb(collection) -> dict:
@@ -251,9 +251,9 @@ def bulk_scan_chromadb(collection) -> dict:
     offset       = 0
     total_scanned = 0
 
-    logger.info("═" * 60)
-    logger.info("  FASE A – BULK SCAN (satu pass seluruh ChromaDB)")
-    logger.info("═" * 60)
+    logger.info("=" * 60)
+    logger.info("  FASE A - BULK SCAN (satu pass seluruh ChromaDB)")
+    logger.info("=" * 60)
 
     with tqdm(desc="Scanning ChromaDB", unit="rec", unit_scale=True, ncols=90) as pbar:
         while True:
@@ -314,7 +314,7 @@ def bulk_scan_chromadb(collection) -> dict:
 
 
 # ===========================================================================
-# FASE B – KLASIFIKASI IN-MEMORY
+# FASE B - KLASIFIKASI IN-MEMORY
 # ===========================================================================
 
 def classify_in_memory(
@@ -342,7 +342,7 @@ def classify_in_memory(
     text   = " ".join(entry["texts"])
     filename = fn
 
-    # ── Fase 1: Regex ──────────────────────────────────────────────
+    # -- Fase 1: Regex ----------------------------------------------
     klaster = extract_klaster(text)
     tahun   = extract_tahun(text, filename)
     amar    = extract_amar(text)
@@ -351,7 +351,7 @@ def classify_in_memory(
     prio    = calc_priority(klaster, amar)
     method  = "regex"
 
-    # ── Fase 2: LLM Fallback (hanya jika klaster kosong) ───────────
+    # -- Fase 2: LLM Fallback (hanya jika klaster kosong) -----------
     if not klaster and llm_fallback and client_llm and prompt_template:
         llm_result = classify_with_llm(text, filename, client_llm, prompt_template)
         if llm_result:
@@ -384,7 +384,7 @@ def classify_in_memory(
 
 
 # ===========================================================================
-# FASE C – BULK WRITE
+# FASE C - BULK WRITE
 # ===========================================================================
 
 def bulk_write_updates(collection, results: list, dry_run: bool) -> int:
@@ -392,9 +392,9 @@ def bulk_write_updates(collection, results: list, dry_run: bool) -> int:
     Tulis semua update ke ChromaDB dalam batch besar.
     Returns jumlah total records yang diupdate.
     """
-    logger.info("═" * 60)
-    logger.info("  FASE C – BULK WRITE")
-    logger.info("═" * 60)
+    logger.info("=" * 60)
+    logger.info("  FASE C - BULK WRITE")
+    logger.info("=" * 60)
 
     # Kumpulkan semua (id, meta) yang perlu diupdate
     all_ids:   list[str]  = []
@@ -429,7 +429,7 @@ def bulk_write_updates(collection, results: list, dry_run: bool) -> int:
                 logger.error(f"[WRITE] Error pada batch {i//WRITE_BATCH_SIZE}: {exc}")
             pbar.update(1)
 
-    logger.info(f"✅ Bulk write selesai: {total_records:,} records diupdate.")
+    logger.info(f"OK Bulk write selesai: {total_records:,} records diupdate.")
     return total_records
 
 
@@ -439,7 +439,7 @@ def bulk_write_updates(collection, results: list, dry_run: bool) -> int:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Hybrid Agent 1 Classifier – MEGA-OPTIMIZED (Bulk Scan → Parallel Regex → Bulk Write)"
+        description="Hybrid Agent 1 Classifier - MEGA-OPTIMIZED (Bulk Scan -> Parallel Regex -> Bulk Write)"
     )
     parser.add_argument("--workers",      type=int, default=8,
                         help="Jumlah thread paralel untuk klasifikasi in-memory (default: 8)")
@@ -451,14 +451,14 @@ def main():
 
     t_total_start = time.time()
 
-    logger.info("═" * 60)
-    logger.info("  Hybrid Agent 1 Classifier — MEGA-OPTIMIZED")
+    logger.info("=" * 60)
+    logger.info("  Hybrid Agent 1 Classifier - MEGA-OPTIMIZED")
     logger.info(f"  Workers      : {args.workers}")
     logger.info(f"  LLM Fallback : {args.llm_fallback}")
     logger.info(f"  Dry Run      : {args.dry_run}")
-    logger.info("═" * 60)
+    logger.info("=" * 60)
 
-    # ── Init ChromaDB ────────────────────────────────────────────────
+    # -- Init ChromaDB ------------------------------------------------
     logger.info("Menghubungkan ke ChromaDB...")
     chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
     emb_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -469,7 +469,7 @@ def main():
     )
     logger.info(f"ChromaDB terhubung. Total vectors: {collection.count():,}")
 
-    # ── Init LLM (jika perlu) ────────────────────────────────────────
+    # -- Init LLM (jika perlu) ----------------------------------------
     client_llm      = None
     prompt_template = None
     if args.llm_fallback:
@@ -478,9 +478,9 @@ def main():
         prompt_template = load_llm_prompt()
         logger.info("LLM siap.")
 
-    # ════════════════════════════════════════════════════════════════
+    # ================================================================
     # FASE A: BULK SCAN
-    # ════════════════════════════════════════════════════════════════
+    # ================================================================
     t_a = time.time()
     file_map = bulk_scan_chromadb(collection)
     t_a_elapsed = time.time() - t_a
@@ -490,17 +490,17 @@ def main():
     already_done   = sum(1 for e in file_map.values() if e["classified"])
     need_classify  = total_files - already_done
 
-    logger.info(f"\n  📁 Total file unik    : {total_files:,}")
-    logger.info(f"  ⏭️  Sudah terklasifikasi: {already_done:,}")
-    logger.info(f"  🔄 Perlu diklasifikasi : {need_classify:,}")
-    logger.info(f"  ⏱️  Fase A selesai      : {t_a_elapsed:.1f}s\n")
+    logger.info(f"\n   Total file unik    : {total_files:,}")
+    logger.info(f"  SKIP  Sudah terklasifikasi: {already_done:,}")
+    logger.info(f"   Perlu diklasifikasi : {need_classify:,}")
+    logger.info(f"  TIME  Fase A selesai      : {t_a_elapsed:.1f}s\n")
 
-    # ════════════════════════════════════════════════════════════════
+    # ================================================================
     # FASE B: KLASIFIKASI PARALEL IN-MEMORY
-    # ════════════════════════════════════════════════════════════════
-    logger.info("═" * 60)
-    logger.info("  FASE B – KLASIFIKASI PARALEL IN-MEMORY")
-    logger.info("═" * 60)
+    # ================================================================
+    logger.info("=" * 60)
+    logger.info("  FASE B - KLASIFIKASI PARALEL IN-MEMORY")
+    logger.info("=" * 60)
 
     t_b = time.time()
     results: list[dict] = []
@@ -527,14 +527,14 @@ def main():
     t_b_elapsed = time.time() - t_b
     logger.info(f"Fase B selesai: {t_b_elapsed:.1f}s")
 
-    # ════════════════════════════════════════════════════════════════
+    # ================================================================
     # FASE C: BULK WRITE
-    # ════════════════════════════════════════════════════════════════
+    # ================================================================
     t_c = time.time()
     total_written = bulk_write_updates(collection, results, args.dry_run)
     t_c_elapsed = time.time() - t_c
 
-    # ── Statistik ────────────────────────────────────────────────────
+    # -- Statistik ----------------------------------------------------
     counts = defaultdict(int)
     for r in results:
         counts[r.get("method", "unknown")] += 1
@@ -552,23 +552,23 @@ def main():
     t_total = time.time() - t_total_start
 
     logger.info(f"""
-{'═' * 60}
+{'=' * 60}
   STATISTIK AKHIR
-{'═' * 60}
-  📁 Total file unik       : {total_files:,}
-  ⏭️  Di-skip (sudah ada)   : {skip_count:,}
-  📋 Diproses baru         : {processed:,}
-  🔤 Selesai via regex     : {regex_count:,} ({pct_regex:.0f}%)
-  🤖 Dikirim ke LLM        : {llm_count:,} ({pct_llm:.0f}%)
-  ⭐ Marked priority        : {priority_count:,}
-  💾 Records ditulis ke DB  : {total_written:,}
-{'─' * 60}
-  ⏱️  Fase A (Bulk Scan)    : {t_a_elapsed:.1f}s
-  ⏱️  Fase B (Klasifikasi)  : {t_b_elapsed:.1f}s
-  ⏱️  Fase C (Bulk Write)   : {t_c_elapsed:.1f}s
-  ⏱️  TOTAL                 : {t_total:.1f}s ({t_total/60:.1f} menit)
-  💾 Dry-run               : {'YA (tidak ada yang diupdate)' if args.dry_run else 'TIDAK'}
-{'═' * 60}
+{'=' * 60}
+   Total file unik       : {total_files:,}
+  SKIP  Di-skip (sudah ada)   : {skip_count:,}
+   Diproses baru         : {processed:,}
+   Selesai via regex     : {regex_count:,} ({pct_regex:.0f}%)
+   Dikirim ke LLM        : {llm_count:,} ({pct_llm:.0f}%)
+  PRIORITY Marked priority        : {priority_count:,}
+   Records ditulis ke DB  : {total_written:,}
+{'-' * 60}
+  TIME  Fase A (Bulk Scan)    : {t_a_elapsed:.1f}s
+  TIME  Fase B (Klasifikasi)  : {t_b_elapsed:.1f}s
+  TIME  Fase C (Bulk Write)   : {t_c_elapsed:.1f}s
+  TIME  TOTAL                 : {t_total:.1f}s ({t_total/60:.1f} menit)
+   Dry-run               : {'YA (tidak ada yang diupdate)' if args.dry_run else 'TIDAK'}
+{'=' * 60}
 """)
 
 

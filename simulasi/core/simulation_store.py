@@ -1,13 +1,13 @@
 """
-Simulation Store — Persistent Storage untuk Simulasi Sidang MK
+Simulation Store - Persistent Storage untuk Simulasi Sidang MK
 ===============================================================
 Menyimpan setiap simulasi secara individual sebagai JSON file
 agar bisa di-load, di-replay, atau dianalisa ulang kapan saja.
 
 Struktur penyimpanan:
   results/simulations/
-    _index.json              — index cepat untuk listing (metadata saja)
-    sim_<uuid>.json          — data lengkap satu simulasi
+    _index.json              - index cepat untuk listing (metadata saja)
+    sim_<uuid>.json          - data lengkap satu simulasi
 """
 
 import json

@@ -6,9 +6,9 @@ from tqdm import tqdm
 
 # Path Configuration
 # Gunakan file compressed (dedup + cleaned) untuk performa lebih baik:
-#   rag_chunks_compressed.jsonl → 802K chunks, ~920 MB (33.8% lebih kecil, zero info loss)
+#   rag_chunks_compressed.jsonl -> 802K chunks, ~920 MB (33.8% lebih kecil, zero info loss)
 # Atau file original jika ingin rebuild dari awal:
-#   rag_chunks.jsonl → 1.17M chunks, ~1390 MB
+#   rag_chunks.jsonl -> 1.17M chunks, ~1390 MB
 JSONL_PATH = r"E:\Simu JR\simulasi\rag\rag_chunks_compressed.jsonl"
 DB_PATH = r"E:\Simu JR\simulasi\rag\chroma_db"
 COLLECTION_NAME = "mk_knowledge_base"
@@ -101,12 +101,12 @@ def main():
                 metadatas=batch_metadatas
             )
 
-    print("\n🎉 Proses Pembuatan Vector Database Selesai!")
+    print("\n Proses Pembuatan Vector Database Selesai!")
     print(f"Database tersimpan secara permanen di: {DB_PATH}")
     print(f"Total Vector yang tersimpan: {collection.count()}")
 
     # Buat collection intelligence (kosong, akan diisi oleh pipeline)
-    print("\n📦 Membuat collection intelligence pipeline...")
+    print("\n Membuat collection intelligence pipeline...")
     for coll_name, coll_desc in INTELLIGENCE_COLLECTIONS.items():
         try:
             client.get_or_create_collection(
@@ -114,9 +114,9 @@ def main():
                 embedding_function=sentence_transformer_ef,
                 metadata={"description": coll_desc}
             )
-            print(f"  ✅ Collection '{coll_name}' siap.")
+            print(f"  OK Collection '{coll_name}' siap.")
         except Exception as e:
-            print(f"  ⚠️ Gagal membuat collection '{coll_name}': {e}")
+            print(f"  WARNING Gagal membuat collection '{coll_name}': {e}")
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
 """
-Simulasi Sidang Mahkamah Konstitusi (MK) — Entry Point
+Simulasi Sidang Mahkamah Konstitusi (MK) - Entry Point
 ========================================================
 Menjalankan N simulasi sidang pengujian undang-undang (Judicial Review)
 dengan agen AI yang berperan sebagai Pemohon, Pemerintah, dan Panel Hakim.
@@ -118,9 +118,9 @@ async def cli_human_input_callback(prompt: str, rag_context: str, agent_name: st
 
 def print_final_verdict(results: List[Dict[str, Any]]):
     """Menampilkan hasil akhir agregat dari seluruh simulasi."""
-    print("\n" + "═" * 60)
-    print("  🏛️  HASIL VERDICT AGGREGATOR")
-    print("═" * 60)
+    print("\n" + "=" * 60)
+    print("    HASIL VERDICT AGGREGATOR")
+    print("=" * 60)
 
     dimensions = {
         "legal_standing": 25,
@@ -133,7 +133,7 @@ def print_final_verdict(results: List[Dict[str, Any]]):
     valid_results = [r for r in results if "error" not in r.get("scores", {})]
 
     if not valid_results:
-        print("❌ Tidak ada data scoring valid yang bisa diagregasi.")
+        print("FAILED Tidak ada data scoring valid yang bisa diagregasi.")
         return
 
     # Agregasi lintas simulasi
@@ -158,29 +158,29 @@ def print_final_verdict(results: List[Dict[str, Any]]):
     amar_count = Counter(all_amars)
     final_amar = amar_count.most_common(1)[0][0]
 
-    print(f"\n  📊 Simulasi valid: {n}/{len(results)}")
-    print(f"  📈 Skor rata-rata: {avg_total:.1f}/100")
+    print(f"\n   Simulasi valid: {n}/{len(results)}")
+    print(f"   Skor rata-rata: {avg_total:.1f}/100")
 
     # Amar
-    amar_emoji = {"dikabulkan": "✅", "ditolak": "❌", "tidak_dapat_diterima": "⛔"}
-    print(f"\n  ⚖️  AMAR PUTUSAN: {amar_emoji.get(final_amar, '❓')} {final_amar.upper()}")
+    amar_emoji = {"dikabulkan": "OK", "ditolak": "FAILED", "tidak_dapat_diterima": ""}
+    print(f"\n    AMAR PUTUSAN: {amar_emoji.get(final_amar, '')} {final_amar.upper()}")
     print(f"     Voting: {dict(amar_count)}")
 
     # Heatmap kelemahan
-    print(f"\n  🔥 HEATMAP KELEMAHAN (Skor Rata-rata per Dimensi):")
+    print(f"\n   HEATMAP KELEMAHAN (Skor Rata-rata per Dimensi):")
     for dim, max_val in dimensions.items():
         avg_dim = dim_totals[dim] / n
         percent = (avg_dim / max_val) * 100
         bar_len = int(percent / 5)
         bar = "█" * bar_len + "░" * (20 - bar_len)
-        status = "🟢" if percent >= 70 else "🟡" if percent >= 40 else "🔴"
+        status = "" if percent >= 70 else "" if percent >= 40 else ""
         print(f"    {status} {dim.ljust(28)}: {avg_dim:.1f}/{max_val} ({percent:.0f}%) [{bar}]")
 
     # Saran hakim
     if all_catatan:
-        print(f"\n  💡 CATATAN DARI PANEL HAKIM:")
+        print(f"\n   CATATAN DARI PANEL HAKIM:")
         for cat in all_catatan[:10]:  # Limit 10 catatan
-            print(f"    • {cat}")
+            print(f"    - {cat}")
 
     api_usage_items = [
         r.get("api_usage") or r.get("scores", {}).get("api_usage")
@@ -208,10 +208,10 @@ def print_final_verdict(results: List[Dict[str, Any]]):
     for r in valid_results:
         all_dissenting.extend(r.get("dissenting_opinions", []))
     if all_dissenting:
-        print(f"\n  ⚖️  DISSENTING / CONCURRING OPINIONS ({len(all_dissenting)} total):")
+        print(f"\n    DISSENTING / CONCURRING OPINIONS ({len(all_dissenting)} total):")
         for op in all_dissenting:
-            icon = "❗" if op["type"] == "Dissenting Opinion" else "💬"
-            print(f"\n  {icon} {op['type']} — {op['hakim']}")
+            icon = "" if op["type"] == "Dissenting Opinion" else ""
+            print(f"\n  {icon} {op['type']} - {op['hakim']}")
             print(f"     Amar Hakim: {op['amar_hakim']} | Amar Mayoritas: {op['amar_mayoritas']}")
             # Tampilkan 3 baris pertama opinion
             lines = op.get("opinion", "").split("\n")[:3]
@@ -219,7 +219,7 @@ def print_final_verdict(results: List[Dict[str, Any]]):
                 if line.strip():
                     print(f"     {line.strip()}")
 
-    print("\n" + "═" * 60)
+    print("\n" + "=" * 60)
 
 
 async def run_self_correcting_loop(
@@ -230,10 +230,10 @@ async def run_self_correcting_loop(
 ):
     """Menjalankan close-loop self-correcting draft revision."""
     if not SELF_CORRECTING_AVAILABLE:
-        print("❌ Self-correcting loop tidak tersedia.")
+        print("FAILED Self-correcting loop tidak tersedia.")
         return
 
-    print(f"\n🔄 Memulai Self-Correcting Loop (max {max_loops} iterasi, threshold {acceptance_threshold})...\n")
+    print(f"\n Memulai Self-Correcting Loop (max {max_loops} iterasi, threshold {acceptance_threshold})...\n")
 
     loop = SelfCorrectingLoop(
         draft_input=draft_input,
@@ -245,30 +245,30 @@ async def run_self_correcting_loop(
     result = await loop.run()
 
     # Tampilkan hasil
-    print("\n" + "═" * 60)
-    print("  🔄  HASIL SELF-CORRECTING LOOP")
-    print("═" * 60)
-    print(f"\n  ✅ Berhasil: {'YA' if result['success'] else 'TIDAK'}")
-    print(f"  📊 Total Loop: {result['total_loops']} / {result['max_loops']}")
-    print(f"  🏆 Loop Terbaik: #{result['best_loop']} (Skor: {result['best_score']})")
+    print("\n" + "=" * 60)
+    print("    HASIL SELF-CORRECTING LOOP")
+    print("=" * 60)
+    print(f"\n  OK Berhasil: {'YA' if result['success'] else 'TIDAK'}")
+    print(f"   Total Loop: {result['total_loops']} / {result['max_loops']}")
+    print(f"   Loop Terbaik: #{result['best_loop']} (Skor: {result['best_score']})")
 
     if result['history']:
-        print(f"\n  📋 Riwayat Loop:")
+        print(f"\n   Riwayat Loop:")
         for record in result['history']:
             loop_num = record['loop']
             scores = record.get('scores', {})
             total = scores.get('total', 0) if scores else 0
             amar = scores.get('amar', 'unknown') if scores else 'unknown'
             accepted = record.get('accepted', False)
-            status = "✅ DITERIMA" if accepted else "❌ DITOLAK"
+            status = "OK DITERIMA" if accepted else "FAILED DITOLAK"
             print(f"    Loop #{loop_num}: {status} | Amar: {amar} | Skor: {total}/100")
             if record.get('revision'):
                 changes = record['revision'].get('ringkasan_perubahan', [])
                 for c in changes[:3]:
                     print(f"      ↳ {c}")
 
-    print(f"\n  💾 Log tersimpan di: {result['log_dir']}")
-    print("\n" + "═" * 60)
+    print(f"\n   Log tersimpan di: {result['log_dir']}")
+    print("\n" + "=" * 60)
 
     # Simpan hasil akhir juga ke progress history jika ada skor terbaik
     best_record = None
@@ -293,7 +293,7 @@ async def run_simulations(
 ):
     """Menjalankan N simulasi sidang MK."""
     run_mode_label = "Sekuensial" if sequential else "Paralel"
-    print(f"\n🚀 Memulai {n} simulasi ({run_mode_label}, mode={mode})...\n")
+    print(f"\n Memulai {n} simulasi ({run_mode_label}, mode={mode})...\n")
 
     human_callback = cli_human_input_callback if mode == "human" else None
 
@@ -328,7 +328,7 @@ async def run_simulations(
                     draft=draft_input,
                     config={"mode": mode, "sequential": sequential},
                 )
-                print(f"  💾 Simulasi {saved['id']} disimpan (skor: {saved['total_score']}, amar: {saved['amar']})")
+                print(f"   Simulasi {saved['id']} disimpan (skor: {saved['total_score']}, amar: {saved['amar']})")
             except Exception as e:
                 logger.warning(f"Gagal menyimpan simulasi: {e}")
 
@@ -336,7 +336,7 @@ async def run_simulations(
     output_path = str(output_dir / "all_simulations.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
-    print(f"\n📝 Transcript simulasi disimpan di: {output_path}")
+    print(f"\n Transcript simulasi disimpan di: {output_path}")
 
     # Tampilkan verdict
     print_final_verdict(results)
@@ -351,7 +351,7 @@ async def run_simulations(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="🏛️ Simulasi Sidang MK — Pengujian Undang-Undang (AI vs AI)"
+        description=" Simulasi Sidang MK - Pengujian Undang-Undang (AI vs AI)"
     )
     parser.add_argument(
         "--n", type=int, default=3,
@@ -413,7 +413,7 @@ if __name__ == "__main__":
     if args.draft and os.path.exists(args.draft):
         with open(args.draft, "r", encoding="utf-8") as f:
             draft = f.read()
-        print(f"📄 Draft dimuat dari: {args.draft}")
+        print(f" Draft dimuat dari: {args.draft}")
     else:
         draft = (
             "Pemohon mengajukan pengujian Pasal 28 ayat (1) UU No. 11 Tahun 2008 "
@@ -427,7 +427,7 @@ if __name__ == "__main__":
             "bersifat multi-tafsir (overbreadth) dan berpotensi menjadi alat kriminalisasi "
             "terhadap kebebasan berekspresi."
         )
-        print("📄 Menggunakan draft contoh (UU ITE)")
+        print(" Menggunakan draft contoh (UU ITE)")
 
     if args.self_correcting:
         asyncio.run(run_self_correcting_loop(
@@ -461,7 +461,7 @@ if __name__ == "__main__":
         # Tampilkan detail simulasi tersimpan
         data = load_simulation(args.show_sim)
         if not data:
-            print(f"❌ Simulasi '{args.show_sim}' tidak ditemukan.")
+            print(f"FAILED Simulasi '{args.show_sim}' tidak ditemukan.")
         else:
             scores = data.get("scores", {})
             print(f"\n{'='*70}")
@@ -480,7 +480,7 @@ if __name__ == "__main__":
             if catatan:
                 print(f"\n  Pertimbangan Hakim:")
                 for c in catatan:
-                    print(f"    • {c}")
+                    print(f"    - {c}")
             dissenting = data.get("dissenting_opinions", [])
             if dissenting:
                 print(f"\n  Dissenting/Concurring Opinions:")
