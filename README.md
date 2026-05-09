@@ -34,6 +34,20 @@ npm run dev
 
 Backend produksi/lokal utama tetap berjalan di `http://localhost:8080`. Vite development server biasanya berjalan di `http://localhost:5173`.
 
+## Data Besar
+
+Dataset PDF, ChromaDB, hasil RAG, dan artefact runtime besar tidak disimpan di GitHub. Unduh arsip data dari Google Drive:
+
+[simu-jr-data-full-20260509.zip](https://drive.google.com/file/d/14jcLJg9wVGtDBD826usQfoltF9ETNm_-/view?usp=sharing)
+
+Checksum SHA-256:
+
+```text
+0034F9DD3A55617DE4DB7EC487336003D50A1064B36AFECD4AF699EADF89FF9E
+```
+
+Setelah download, ekstrak isi ZIP ke root project sehingga folder seperti `putusan_pdf/`, `risalah_pdf/`, `permohonan_pdf/`, dan `simulasi/rag/chroma_db/` kembali berada di lokasi semula.
+
 ## Struktur Project
 
 ```text
@@ -168,4 +182,3 @@ python rebuild_all.py
 - Perubahan alur simulasi sebaiknya dites minimal dengan `python -m pytest tests -v`.
 - Perubahan RAG atau ChromaDB sebaiknya diverifikasi dengan `python rag/rebuild_all.py --stats` dan endpoint `/api/health`.
 - Untuk UI, jalankan `npm run build` sebelum mengandalkan hasil di `frontend/dist`.
-

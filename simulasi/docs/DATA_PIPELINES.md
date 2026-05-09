@@ -4,6 +4,18 @@ Dokumen ini menjelaskan sumber data, artefact, pipeline RAG, dan area fine-tunin
 
 ## Sumber Data
 
+Arsip data besar tersedia di Google Drive:
+
+[simu-jr-data-full-20260509.zip](https://drive.google.com/file/d/14jcLJg9wVGtDBD826usQfoltF9ETNm_-/view?usp=sharing)
+
+SHA-256:
+
+```text
+0034F9DD3A55617DE4DB7EC487336003D50A1064B36AFECD4AF699EADF89FF9E
+```
+
+Ekstrak arsip ke root project (`E:\Simu JR`) agar path data kembali sesuai tabel berikut.
+
 | Data | Lokasi root | Kegunaan |
 |---|---|---|
 | Putusan PUU PDF | `E:\Simu JR\putusan_pdf` | Basis putusan dan ratio decidendi |
@@ -20,10 +32,6 @@ Dokumen ini menjelaskan sumber data, artefact, pipeline RAG, dan area fine-tunin
 | `extract_pdf_links.py` | Mengekstrak link PDF dari HTML sumber |
 | `download_putusan_pdf.py` | Download putusan PUU |
 | `download_risalah_pipeline.py` | Download risalah PUU |
-| `download_permohonan.py` | Download permohonan |
-| `verify_permohonan.py` | Verifikasi hasil download permohonan |
-| `analyze_permohonan.py` | Analisis permohonan |
-| `reorganize_permohonan.py` | Merapikan struktur file permohonan |
 
 ## RAG Artefact
 
@@ -180,4 +188,3 @@ Invoke-RestMethod http://localhost:8080/api/health
 | Embedding lambat/gagal | Model embedding memakai device yang tidak tersedia | Cek `rebuild_all.py`, bagian `SentenceTransformerEmbeddingFunction` |
 | Draft tidak memakai konteks relevan | Retrieval kurang cocok | Cek `rag.n_results`, `score_threshold`, dan query yang dikirim |
 | JSONL terlalu besar | Data belum dikompresi | Jalankan `rebuild_all.py --compress` |
-
